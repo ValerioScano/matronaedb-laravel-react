@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::create('editions', function (Blueprint $table) {
             $table->id();
-            $table->string('corpus');
-            $table->tinyInteger('volume')->nullable();
-            $table->mediumInteger('number_inscription')->nullable();
-            $table->integer('publication_year')->nullable();
+            $table->string('corpus')->index();
+            $table->tinyInteger('volume')->nullable()->index();
+            $table->mediumInteger('number_inscription')->nullable()->index();
+            $table->unsignedSmallInteger('publication_year')->nullable();
             $table->mediumInteger('corpus_page')->nullable();
             $table->string('last_name_author')->nullable();
-            $table->foreignId('filing_id')->constrained();
+            $table->string('edition_image')->nullable();
+            $table->morphs('editionable');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -40,7 +40,7 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 - Creare una nuova schedatura (proposal) 
 - Modificare una propria proposal in stato `pending`
 - Eliminare una propria proposal in stato `pending`
-- Proporre una revisione di un filing approvato
+- Proporre una revisione di un filing approvato (proposal modifying of existing filing)
 - Visualizzare le proprie proposal (pending, approved, rejected)
 
 ### Admin
@@ -58,7 +58,8 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 | Campo | Tipo | Note |
 |-------|------|------|
 | id | bigint | PK |
-| name | string | |
+| first_name | string | |
+| last_name | string | |
 | email | string | unique |
 | password | string | |
 | role | enum | 'registered_user', 'admin' |
@@ -87,7 +88,7 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 | Campo | Tipo | Note |
 |-------|------|------|
 | id | bigint | PK |
-| filing_id | fk | → filings.id, nullable (null = nuova schedatura) |
+| filing_id | fk | → filings.id, nullable |
 | text | text | |
 | region | string | |
 | province | string | |
@@ -114,8 +115,9 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 | number_inscription | integer | nullable |
 | publication_year | integer | nullable |
 | corpus_page | integer | nullable |
-| author | string | nullable |
-| filing_id | fk | → filings.id |
+| last_name_author | string | nullable |
+| editionable_id | bigint | FK polimorfica |
+| editionable_type | string | 'App\Models\Filing' o 'App\Models\Proposal' |
 | timestamps | | |
 
 ### tags
@@ -127,13 +129,13 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 | category | string | categoria |
 | timestamps | | |
 
-### filing_tag
+### taggables
 | Campo | Tipo | Note |
 |-------|------|------|
-| filing_id | fk | → filings.id |
 | tag_id | fk | → tags.id |
+| taggable_id | bigint | FK polimorfica |
+| taggable_type | string | 'App\Models\Filing' o 'App\Models\Proposal' |
 | timestamps | | |
-
 ---
 
 ## Ciclo di vita di una proposal
@@ -142,7 +144,6 @@ Un progetto pensato per Alice Cicarelli, ideato da Valerio Scano.
 
 Registered User crea proposal
         ↓
-    status: pending
         ↓
     Admin revisiona
        ↙        ↘

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,7 +19,8 @@ class DatabaseSeeder extends Seeder
             TagSeeder::class,
             FilingSeeder::class,
             ProposalSeeder::class,
-            EditionSeeder::class,
+            TaggableSeeder::class,
+            EditionsSeeder::class,
         ]);
     }
 }

@@ -14,18 +14,18 @@ return new class extends Migration
         Schema::create('filings', function (Blueprint $table) {
             $table->id();
             $table->text('text');
-            $table->string('region');
-            $table->string('province');
-            $table->string('city')->nullable();
-            $table->integer('min_year')->nullable();
-            $table->integer('max_year')->nullable();
+            $table->string('region')->index();
+            $table->string('province')->index();
+            $table->string('city')->nullable()->index();
+            $table->smallInteger('min_year')->nullable()->index();
+            $table->smallInteger('max_year')->nullable()->index();
             $table->boolean('is_certain_date')->default(false);
             $table->boolean('is_sacred_dedication')->default(false);
             $table->text('notes')->nullable();
             $table->enum('religion', ['uncertain', 'pagan', 'christian']);
             $table->softDeletes();
-            $table->foreignId('proposed_by')->constrained('users');
-            $table->foreignId('approved_by')->constrained('users');
+            $table->foreignId('proposed_by')->constrained('users')->restrictOnDelete();
+            $table->foreignId('approved_by')->constrained('users')->restrictOnDelete();
             $table->timestamps();
         });
     }

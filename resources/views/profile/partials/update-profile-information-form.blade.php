@@ -13,16 +13,26 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('my.profile.update') }}" class="mt-6 space-y-6">
         @csrf
         @method('patch')
 
         <div class="mb-2">
-            <label for="name">{{__('Name')}}</label>
-            <input class="form-control" type="text" name="name" id="name" autocomplete="name" value="{{old('name', $user->name)}}" required autofocus>
-            @error('name')
+            <label for="first_name">{{__('First_name')}}</label>
+            <input class="form-control" type="text" name="first_name" id="first_name" autocomplete="first_name" value="{{old('first_name', $user->first_name)}}" required autofocus>
+            @error('first_name')
             <span class="invalid-feedback" role="alert">
-                <strong>{{ $errors->get('name')}}</strong>
+                <strong>{{ $errors->get('first_name')}}</strong>
+            </span>
+            @enderror
+        </div>
+
+        <div class="mb-2">
+            <label for="last_name">{{__('Last_name')}}</label>
+            <input class="form-control" type="text" name="last_name" id="last_name" autocomplete="last_name" value="{{old('last_name', $user->last_name)}}" required autofocus>
+            @error('last_name')
+            <span class="invalid-feedback" role="alert">
+                <strong>{{ $errors->get('last_name')}}</strong>
             </span>
             @enderror
         </div>

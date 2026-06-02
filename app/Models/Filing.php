@@ -4,17 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Filing extends Model
 {
     use SoftDeletes; 
     
-    public function editions() {
-        return $this->hasMany(Edition::class);
+    public function editions(): MorphMany {
+        return $this->morphMany(Edition::class, 'editionable');
     }
 
-    public function tags() {
-        return $this->belongsToMany(Tag::class);
+    public function tags() : MorphToMany {
+        return $this->morphToMany(Tag::class, 'taggable');
     }
 
     public function proposedBy() {

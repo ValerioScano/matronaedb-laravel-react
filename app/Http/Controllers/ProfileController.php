@@ -11,6 +11,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    // Display user's dashboard
+    public function dashboard()
+    {
+        return view('pages.userpages.dashboard');
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -34,7 +40,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('my.profile.edit')->with('status', 'profile-updated');
     }
 
     /**
