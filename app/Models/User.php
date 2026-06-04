@@ -65,4 +65,8 @@ class User extends Authenticatable
     public function approvedProposals() {
         return $this->hasMany(Proposal::class, 'approved_by');
     }
+
+    public function isAdmin(): bool {
+        return $this->role === 'admin';
+    }
 }

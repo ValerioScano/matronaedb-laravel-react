@@ -1,0 +1,11 @@
+.container_logo {
+    width: 70px;
+}
+
+.logo {
+    width: 100%;
+}
+
+.active {
+    text-decoration-line: underline;
+}

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\HasBibliography;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Filing extends Model
 {
     use SoftDeletes; 
+    use HasBibliography;
     
     public function editions(): MorphMany {
         return $this->morphMany(Edition::class, 'editionable');
