@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->softDeletes();
+            $table->unique(['email', 'deleted_at']);
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropUnique('users_email_deleted_at_unique');
+            $table->dropSoftDeletes();
         });
     }
 };

@@ -1,83 +1,65 @@
 <?php
 
-use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\FilingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// // Rotte pubbliche — accessibili a tutti
-// Route::controller(PublicPageController::class)->group(function () {
-//     Route::get('/', 'welcome')->name('welcome');
-//     Route::get('/filings', 'index')->name('filings.index');
-//     Route::get('/filings/{filing}', 'show')->name('filings.show');
-// });
+// Welcome
+Route::view('/', 'pages.welcome')->name('welcome');
 
-// Rotte per utenti autenticati
-Route::middleware(['auth', 'verified'])
-    ->prefix('my')
-    ->name('my.')->group(function () {
+// Dashboard
+Route::get('/dashboard', [ProfileController::class, 'dashboard'])
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
-        // Profilo
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
+// Filings
+Route::prefix('filings')->name('filings.')->group(function () {
+    Route::get('/', [FilingController::class, 'index'])->name('index');
+    Route::get('/{filing}', [FilingController::class, 'show'])->name('show');
+    Route::delete('/{filing}', [FilingController::class, 'destroy'])
+        ->middleware(['auth', 'verified', 'admin'])
+        ->name('destroy');
+});
 
-        // Filings
-        Route::controller(ProposalController::class)
-            ->prefix('proposals')
-            ->name('proposals.')
-            ->group(function () {
-                Route::get('/', 'index')->name('index');                        // lista proprie proposals
-                Route::get('/create', 'create')->name('create');                // compila nuova schedatura
-                Route::post('/', 'store')->name('store');                       // salva nuova schedatura
-                Route::get('/{proposal}', 'show')->name('show');                // mostra propria proposal
-                Route::get('/{proposal}/edit', 'edit')->name('edit');           // form modifica proposal pendente
-                Route::put('/{proposal}', 'update')->name('update');            // aggiorna proposal pendente
-                Route::delete('/{proposal}', 'destroy')->name('destroy');       // elimina proposal pendente
-            });
+// Proposals + Revisions
+Route::prefix('proposals')->name('proposals.')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [ProposalController::class, 'index'])->name('index');
+    Route::get('/create', [ProposalController::class, 'create'])->name('create');
+    Route::post('/', [ProposalController::class, 'store'])->name('store');
+    Route::get('/pending', [ProposalController::class, 'pending'])
+        ->middleware('admin')
+        ->name('pending');
+    Route::get('/{proposal}', [ProposalController::class, 'show'])->name('show');
+    Route::get('/{proposal}/edit', [ProposalController::class, 'edit'])->name('edit');
+    Route::put('/{proposal}', [ProposalController::class, 'update'])->name('update');
+    Route::delete('/{proposal}', [ProposalController::class, 'destroy'])->name('destroy');
+    Route::patch('/{proposal}/approve', [ProposalController::class, 'approve'])
+        ->middleware('admin')
+        ->name('approve');
+    Route::patch('/{proposal}/reject', [ProposalController::class, 'reject'])
+        ->middleware('admin')
+        ->name('reject');
+    // Revisions
+    Route::get('/filings/{filing}/create', [ProposalController::class, 'createRevision'])->name('revisions.create');
+    Route::post('/filings/{filing}', [ProposalController::class, 'storeRevision'])->name('revisions.store');
+});
 
-        // Revisions — proposte di modifica di filing esistenti (filing_id valorizzato)
-        Route::controller(ProposalController::class)
-            ->prefix('filings/{filing}/revisions')
-            ->name('revisions.')
-            ->group(function () {
-                Route::get('/create', 'createRevision')->name('create');        // form revisione filing
-                Route::post('/', 'storeRevision')->name('store');               // salva revisione
-            });
-    });
+// Users
+Route::prefix('users')->name('users.')->middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('index');
+    Route::patch('/{user}/role', [UserController::class, 'updateRole'])->name('updateRole');
+    Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+    Route::delete('/{user}/with-records', [UserController::class, 'destroyWithRecords'])->name('destroyWithRecords');
+});
 
-// Rotte solo admin
-Route::middleware(['auth', 'verified', 'admin'])
-    ->prefix('admin')
-    ->name('admin.')
-    ->group(function () {
-        Route::controller(AdminController::class)->group(function () {
-            Route::get('/dashboard', 'dashboard')->name('dashboard');
-
-            // Gestione proposals (nuove schedature)
-            Route::prefix('proposals')->name('proposals.')->group(function () {
-                Route::get('/pending', 'pendingProposals')->name('pending');
-                Route::patch('/{proposal}/approve', 'approve')->name('approve');
-                Route::patch('/{proposal}/reject', 'reject')->name('reject');
-            });
-
-            // Gestione filings approvati
-            Route::prefix('filings')->name('filings.')->group(function () {
-                Route::get('/', 'indexFilings')->name('index');
-                Route::get('/{filing}', 'showFiling')->name('show');
-                Route::delete('/{filing}', 'destroyFiling')->name('destroy');
-            });
-
-            // Gestione users
-            Route::prefix('users')->name('users.')->group(function () {
-                Route::get('/', 'indexUsers')->name('index');
-                Route::patch('/{user}/role', 'updateRole')->name('updateRole');
-                Route::delete('/{user}', 'destroyUser')->name('destroy');
-                Route::delete('/{user}/with-records', 'destroyUserWithRecords')->name('destroyWithRecords');
-            });
-        });
-    });
+// Profile
+Route::prefix('profile')->name('profile.')->middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', [ProfileController::class, 'edit'])->name('edit');
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::delete('/', [ProfileController::class, 'destroy'])->name('destroy');
+});
 
 require __DIR__.'/auth.php';

@@ -3,8 +3,9 @@
     <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
-                <h1>Database for the admins</h1>
-                <p>Apply filters or browse through the entire database with admin priviledges</p>
+                <h1>Browse the database</h1>
+                <p>Apply filters or browse through the entire database 
+                    @if (Auth::user()?->isAdmin())with admin privileges @endif</p>
             </div>
         </div>
 
@@ -26,20 +27,25 @@
                             <th scope="row">{{ $filing->id }}</th>
 
                             <td>
-                                @foreach ($filing->editions as $edition)
-                                    {{ $edition->corpus }} {{$edition->volume}} {{ $edition->number_inscription }}
-                                @endforeach
+                                <ul>
+                                    @foreach ($filing->formatBibliography() as $entry)
+                                        <li>{{ $entry['text'] }}</li>
+                                    @endforeach
+                                </ul>
                             </td>
 
-                            <td>{{ $filing->region }} {{ $filing->province }}</td>
-                            <td>{{ $filing->text }}</td>
-                            <td>{{ $filing->min_year }} - {{ $filing->max_year }}</td>
+                            <td>{{ $filing->location}}</td>
+                            <td>{{ $filing->textTruncate() }}</td>
+                            <td>{{ $filing->datation}}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <a class="btn btn-outline-primary"
-                                        href="{{ route('admin.filings.show', $filing->id) }}">Show details</a>
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal-{{ $filing->id }}">Elimina</button>
+                                        href="{{ route('filings.show', $filing->id) }}">Show details</a>
+
+                                    @if (Auth::user()?->isAdmin())
+                                        <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal-{{ $filing->id }}">Elimina</button>
+                                    @endif
                                 </div>
                             </td>
 
@@ -59,7 +65,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <form action="{{ route('admin.filings.destroy', $filing) }}" method="POST">
+                                        <form action="{{ route('filings.destroy', $filing) }}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <input type="submit" class="btn btn-danger" value="Delete">

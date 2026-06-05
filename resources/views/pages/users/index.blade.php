@@ -53,57 +53,57 @@
                                             </div>
                                             <div class="modal-footer">
                                                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                <form action="{{ route('admin.users.updateRole', $user) }}" method="POST"
+                                                <form action="{{ route('users.updateRole', $user) }}" method="POST"
                                                     class="d-inline">
                                                     @csrf
                                                     @method('PATCH')
                                                     <button type="submit" class="btn btn-warning">
-                                                            {{ $user->role === 'admin' ? 'Revoke admin' : 'Make admin' }}
-                                                        </button>
-                                                    </form>
-                                                </div>
+                                                        {{ $user->role === 'admin' ? 'Revoke admin' : 'Make admin' }}
+                                                    </button>
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
+                                </div>
 
 
 
-                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal"
-                                        data-bs-target="#deleteModal-{{ $user->id }}">
-                                        Delete account
-                                    </button>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal-{{ $user->id }}">
+                                    Delete account
+                                </button>
 
-                                    {{-- Logica modale cancellazione user's account --}}
-                                    <div class="modal fade" id="deleteModal-{{ $user->id }}">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Confirm deletion</h5>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Are you sure you want to delete this account?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                    <form action="{{ route('admin.users.destroy', $user) }}"
-                                                        method="GET">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <input type="submit" class="btn btn-warning" value="Delete">
-                                                    </form>
-                                                    <form action="{{ route('admin.users.destroyWithRecords', $user) }}"
-                                                        method="GET">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <input type="submit" class="btn btn-danger" value="Delete with all records">
-                                                    </form>
-                                                </div>
+                                {{-- Logica modale cancellazione user's account --}}
+                                <div class="modal fade" id="deleteModal-{{ $user->id }}">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirm deletion</h5>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete this account?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ route('users.destroy', $user) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="submit" class="btn btn-warning" value="Delete">
+                                                </form>
+                                                <form action="{{ route('users.destroyWithRecords', $user) }}"
+                                                    method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="submit" class="btn btn-danger"
+                                                        value="Delete with all records">
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
-                                </td>
-                            </tr>
-     @endforeach
+                                </div>
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
             {{ $users->links('pagination::bootstrap-5') }}

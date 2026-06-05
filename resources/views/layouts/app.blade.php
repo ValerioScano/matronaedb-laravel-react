@@ -43,7 +43,7 @@
                         <!-- Left Side Of Navbar -->
                         <ul class="navbar-nav me-auto">
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ Auth::user()?->role === 'admin' ? url('/admin/filings') : url('/filings') }}">{{ __('Browse database') }}</a>
+                                <a class="nav-link" href="{{ url('/filings') }}">{{ __('Browse database') }}</a>
                             </li>
                         </ul>
 
@@ -68,9 +68,9 @@
 
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                         <a class="dropdown-item"
-                                            href="{{ (Auth::user() && Auth::user()->role === 'admin') ? route('admin.dashboard') : route('my.dashboard') }}">{{ __('Dashboard') }}</a>
+                                            href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                                         <a class="dropdown-item"
-                                            href="{{ route('my.profile.edit') }}">{{ __('Profile') }}</a>
+                                            href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

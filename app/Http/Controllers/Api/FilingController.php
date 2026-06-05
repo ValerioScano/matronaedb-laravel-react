@@ -16,10 +16,7 @@ class FilingController extends Controller
     {
         $filings = Filing::orderBy('created_at', 'desc')->with(['editions', 'tags'])->paginate(20);
 
-        return response()->json([
-            'success' => true,
-            'data' => $filings,
-        ]);
+        return response()->json($filings);
 
     }
 
@@ -27,9 +24,6 @@ class FilingController extends Controller
     {
         $filing->load(['tags', 'editions']);
 
-        return response()->json([
-            'success' => true,
-            'data' => $filing,
-        ]);
+        return response()->json($filing);
     }
 }

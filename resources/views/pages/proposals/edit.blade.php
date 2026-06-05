@@ -8,10 +8,19 @@
                 <h1>Add a new filing</h1>
             </div>
         </div>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
 
         <div class="container">
-            <form action="{{ route('my.proposals.update', $proposal) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('proposals.update', $proposal) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -20,7 +29,8 @@
                     {{-- Testo iscrizione --}}
                     <h3>Inscription's details</h3>
                     <div class="col-12 my-3">
-                        <label for="text" class="form-label">Add the inscription's text</label>
+                        <label for="text" class="form-label">Add inscription's text <span
+                                class="text-danger">*</span></label>
                         <textarea name="text" class="form-control" style="height:auto" id="text" aria-describedby="text-help" required>{{ $proposal->text }}</textarea>
                         <div id="text-help" class="form-text">Use conventional transcribing system to register the text
                         </div>
@@ -29,13 +39,13 @@
                     {{-- Localizzazione iscrizione --}}
 
                     <div class="col-4 mb-3">
-                        <label for="region" class="form-label">Region</label>
+                        <label for="region" class="form-label">Region <span class="text-danger">*</span></label>
                         <input name="region" type="text" class="form-control" id="region" required autocomplete="off"
                             value="{{ $proposal->region }}">
                     </div>
 
                     <div class="col-4 mb-3">
-                        <label for="province" class="form-label">Province</label>
+                        <label for="province" class="form-label">Province <span class="text-danger">*</span></label>
                         <input name="province" type="text" class="form-control" id="province" required
                             value="{{ $proposal->province }}">
                     </div>
@@ -137,16 +147,18 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="edition_image">Immagine edizione a stampa</label>
-                                        @if($edition->edition_image)
+                                        @if ($edition->edition_image)
                                             <div class="mb-2">
-                                                <p class="text-muted small">Current file: 
-                                                    <a href="{{asset('storage/' . $edition->edition_image) }}" target="_blank" class="text-decoration-none">View</a>
+                                                <p class="text-muted small">Current file:
+                                                    <a href="{{ asset('storage/' . $edition->edition_image) }}"
+                                                        target="_blank" class="text-decoration-none">View</a>
                                                 </p>
                                             </div>
                                         @endif
-                                        <input type="file" name="editions[{{$i}}][edition_image]" id="edition_image_{{$i}}"
-                                            class="form-control">
-                                        <small class="form-text text-muted">Upload a new file to replace the existing one</small>
+                                        <input type="file" name="editions[{{ $i }}][edition_image]"
+                                            id="edition_image_{{ $i }}" class="form-control">
+                                        <small class="form-text text-muted">Upload a new file to replace the existing
+                                            one</small>
                                     </div>
                                     {{-- hidden per passare l'id dell'edizione esistente --}}
                                     <input type="hidden" name="editions[{{ $i }}][id]"
@@ -163,26 +175,27 @@
                 </div>
 
                 {{-- Sezione tags  --}}
-
-                <div
-                    class="row align-items-center gx-5 gap-3 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
-                    <h4 class="col-12">Tags</h4>
+                
+                <div class="row gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
+                    <h4 class="mb-4">Tags</h4>
 
                     @foreach ($groupedTags as $category => $tags)
-                        <fieldset class="col-4 border border-warning-subtle rounded-4 d-flex flex-wrap gap-2">
-                            <legend>{{ $category }}</legend>
-
-                            @foreach ($tags as $tag)
-                                <div>
-                                    <input type="checkbox" id="tag_{{ $tag->id }}" name="tags[]"
-                                        value="{{ $tag->id }}" @checked($proposal->tags->contains($tag->id))>
-                                    <label for="tag_{{ $tag->id }}">{{ $tag->label }}</label>
-                                </div>
-                            @endforeach
-                        </fieldset>
+                        <div class="col-12 mb-4">
+                            <h6 class="fw-bold text-uppercase text-muted mb-3 border-bottom pb-2">{{ ucfirst($category) }}
+                            </h6>
+                            <div class="d-flex flex-wrap gap-3">
+                                @foreach ($tags as $tag)
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="tag_{{ $tag->id }}"
+                                            name="tags[]" value="{{ $tag->id }}" @checked(in_array($tag->id, old('tags', $proposal->tags->pluck('id')->toArray())))>
+                                        <label class="form-check-label"
+                                            for="tag_{{ $tag->id }}">{{ $tag->label }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     @endforeach
                 </div>
-
 
                 <div class="col-12 mb-3">
                     <button type="submit" class="btn btn-primary">Submit</button>

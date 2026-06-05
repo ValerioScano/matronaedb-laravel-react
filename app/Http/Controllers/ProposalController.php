@@ -19,7 +19,7 @@ class ProposalController extends Controller
     {
         $user_proposals = Proposal::where('proposed_by', Auth::id())->orderBy('updated_at', 'desc')->paginate(20);
 
-        return view('pages.userpages.user_proposals', compact('user_proposals'));
+        return view('pages.proposals.index', compact('user_proposals'));
     }
 
     public function show(Proposal $proposal)
@@ -27,7 +27,7 @@ class ProposalController extends Controller
         $proposal->load(['editions']);
         $groupedTags = $proposal->tags->groupBy('category');
 
-        return view('pages.userpages.proposal_show', compact('proposal', 'groupedTags'));
+        return view('pages.proposals.show', compact('proposal', 'groupedTags'));
     }
 
     /**
@@ -38,7 +38,7 @@ class ProposalController extends Controller
         $tags = Tag::all();
         $groupedTags = $tags->groupBy('category');
 
-        return view('pages.userpages.create_proposal', compact('groupedTags'));
+        return view('pages.proposals.create', compact('groupedTags'));
     }
 
     /**
@@ -46,7 +46,16 @@ class ProposalController extends Controller
      */
     public function store(Request $request)
     {
+        $request->validate([
+            'text' => 'required',
+            'region' => 'required',
+            'province' => 'required',
+            'min_year' => 'required|integer',
+            'max_year' => 'required|integer',
+            'religion' => 'required|in:uncertain,pagan,christian',
+        ]);
         $data = $request->all();
+
         $proposal = new Proposal;
         $proposal->text = $data['text'];
         $proposal->region = $data['region'];
@@ -86,7 +95,7 @@ class ProposalController extends Controller
             $proposal->tags()->sync($data['tags']);
         }
 
-        return redirect()->route('my.proposals.show', $proposal);
+        return redirect()->route('proposals.show', $proposal);
     }
 
     /**
@@ -98,7 +107,7 @@ class ProposalController extends Controller
         $tags = Tag::all();
         $groupedTags = $tags->groupBy('category');
 
-        return view('pages.userpages.modify_proposal', compact('proposal', 'groupedTags'));
+        return view('pages.proposals.edit', compact('proposal', 'groupedTags'));
     }
 
     /**
@@ -106,6 +115,14 @@ class ProposalController extends Controller
      */
     public function update(Request $request, Proposal $proposal)
     {
+        $request->validate([
+            'text' => 'required',
+            'region' => 'required',
+            'province' => 'required',
+            'min_year' => 'required|integer',
+            'max_year' => 'required|integer',
+            'religion' => 'required|in:uncertain,pagan,christian',
+        ]);
         $data = $request->all();
 
         // 1. Aggiorna la proposal
@@ -161,7 +178,7 @@ class ProposalController extends Controller
             $proposal->tags()->detach();
         }
 
-        return redirect()->route('my.proposals.show', $proposal);
+        return redirect()->route('proposals.show', $proposal);
     }
 
     public function destroy(Proposal $proposal)
@@ -175,7 +192,7 @@ class ProposalController extends Controller
         $proposal->tags()->detach();
         $proposal->delete();
 
-        return redirect()->route('my.proposals.index');
+        return redirect()->route('proposals.index');
     }
 
     public function createRevision(Filing $filing)
@@ -184,11 +201,19 @@ class ProposalController extends Controller
         $tags = Tag::all();
         $groupedTags = $tags->groupBy('category');
 
-        return view('pages.userpages.create_revision', compact('filing', 'groupedTags'));
+        return view('pages.proposals.create_revision', compact('filing', 'groupedTags'));
     }
 
     public function storeRevision(Request $request, Filing $filing)
     {
+        $request->validate([
+            'text' => 'required',
+            'region' => 'required',
+            'province' => 'required',
+            'min_year' => 'required|integer',
+            'max_year' => 'required|integer',
+            'religion' => 'required|in:uncertain,pagan,christian',
+        ]);
         $data = $request->all();
 
         // 1. Crea la nuova proposal con filing_id valorizzato
@@ -232,6 +257,87 @@ class ProposalController extends Controller
             $proposal->tags()->sync($data['tags']);
         }
 
-        return redirect()->route('my.proposals.show', $proposal);
+        return redirect()->route('proposals.show', $proposal);
+    }
+
+    /**
+     * Display list of all proposals.
+     */
+    public function pending(Proposal $proposal)
+    {
+        $user_proposals = Proposal::where('status', 'pending')->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('pages.proposals.pending', compact('user_proposals'));
+    }
+
+    /**
+     * Approve the filing.
+     */
+    public function approve(Proposal $proposal)
+    {
+        if ($proposal->status !== 'pending') {
+            return redirect()->route('proposals.pending')
+                ->with('error', 'This proposal has already been processed.');
+        }
+        // 1. Crea o aggiorna il filing
+        if ($proposal->filing_id) {
+            // È una revisione — aggiorna il filing esistente
+            $filing = Filing::find($proposal->filing_id);
+        } else {
+            // È una nuova schedatura — crea un nuovo filing
+            $filing = new Filing;
+        }
+
+        // 2. Copia i campi dalla proposal al filing
+        $filing->text = $proposal->text;
+        $filing->region = $proposal->region;
+        $filing->province = $proposal->province;
+        $filing->city = $proposal->city;
+        $filing->min_year = $proposal->min_year;
+        $filing->max_year = $proposal->max_year;
+        $filing->is_certain_date = $proposal->is_certain_date;
+        $filing->is_sacred_dedication = $proposal->is_sacred_dedication;
+        $filing->religion = $proposal->religion;
+        $filing->notes = $proposal->notes;
+        $filing->proposed_by = $proposal->proposed_by;
+        $filing->approved_by = Auth::id();
+        $filing->save();
+
+        // 3. Copia le edizioni
+        $filing->editions()->delete(); // elimina le vecchie se è una revisione
+        foreach ($proposal->editions as $edition) {
+            $filing->editions()->create([
+                'corpus' => $edition->corpus,
+                'volume' => $edition->volume,
+                'number_inscription' => $edition->number_inscription,
+                'publication_year' => $edition->publication_year,
+                'corpus_page' => $edition->corpus_page,
+                'last_name_author' => $edition->last_name_author,
+                'edition_image' => $edition->edition_image,
+            ]);
+        }
+
+        // 4. Copia i tags
+        $filing->tags()->sync($proposal->tags->pluck('id'));
+
+        // 5. Aggiorna lo stato della proposal
+        $proposal->status = 'approved';
+        $proposal->approved_by = Auth::id();
+        $proposal->save();
+
+        return redirect()->route('proposals.pending');
+    }
+
+    /**
+     * Reject the filing.
+     */
+    public function reject(Proposal $proposal, Request $request)
+    {
+        $proposal->status = 'rejected';
+        $proposal->rejection_notes = $request->rejection_notes;
+        $proposal->approved_by = Auth::id();
+        $proposal->save();
+
+        return redirect()->route('proposals.pending');
     }
 }

@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Edition extends Model
 {
     use SoftDeletes;
-    use HasBibliography;
 
     protected $fillable = [
         'corpus',

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Traits\HasBibliography;
+use App\Traits\HasDatation;
+use App\Traits\HasOrigin;
+use App\Traits\HasTruncate;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -12,7 +15,10 @@ class Filing extends Model
 {
     use SoftDeletes; 
     use HasBibliography;
-    
+    use HasOrigin;
+    use HasDatation;
+    use HasTruncate;
+
     public function editions(): MorphMany {
         return $this->morphMany(Edition::class, 'editionable');
     }

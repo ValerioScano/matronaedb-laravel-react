@@ -13,6 +13,7 @@ function InscriptionPortalPage() {
     axios
       .get(`http://127.0.0.1:8000/api/filings?page=${currentPage}`)
       .then((response) => {
+        console.log(response.data);
         setInscriptions(response.data.data ?? []);
         setTotalPages(response.data.last_page ?? 1);
       })

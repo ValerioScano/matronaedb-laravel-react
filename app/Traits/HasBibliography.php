@@ -20,7 +20,10 @@ trait HasBibliography {
                 $result .= $edition->number_inscription ? ' ' . $edition->number_inscription : '';
                 $result .= $edition->last_name_author ? ', ' . $edition->last_name_author : '';
             }
-            return $result;
+            return [
+                'text' => $result,
+                'image' => $edition->edition_image ?? null,
+            ];
         });
     }
 }
