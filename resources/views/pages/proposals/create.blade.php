@@ -91,6 +91,11 @@
                         to
                         consult your filing </div>
                 </div>
+                
+                <div class="col-12 mb-3">
+                    <label for="private_notes" class="form-label">Is there anything that the admin should know?</label>
+                    <textarea name="private_notes" id="private_notes" class="form-control"></textarea>
+                </div>
             </div>
 
 
@@ -99,8 +104,8 @@
             <div class="row align-items-center gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
                 <h4>Editions</h4>
                 <div class="col-12 my-3">
-                    <div id="editions-container">
-                        {{-- Le edizioni verranno aggiunte qui --}}
+                    <div id="editions-container" data-editions='[]'>
+                        {{-- Edizioni aggiunte qui: --}}
                     </div>
                     <button type="button" class="btn btn-outline-primary" id="add-edition-btn">Add edition</button>
                 </div>

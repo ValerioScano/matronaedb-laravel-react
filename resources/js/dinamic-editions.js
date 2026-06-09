@@ -1,80 +1,161 @@
+const container = document.getElementById('editions-container');
 let editionCount = 0;
 
-document.getElementById('add-edition-btn').addEventListener('click', addEdition);
+const fieldsByType = {
+    corpus: ['corpus', 'volume', 'number_inscription', 'link'],
+    journal: ['corpus', 'publication_year', 'corpus_page', 'number_inscription', 'last_name_author', 'link'],
+    book: ['corpus', 'volume', 'last_name_author', 'link']
+};
 
-document.getElementById('editions-container').addEventListener('click', function (e) {
-    if (e.target.classList.contains('remove-edition-btn')) {
-        e.target.closest('.edition-row').remove();
-    }
-    if (e.target.classList.contains('edition-type-switch')) {
-        const editionRow = e.target.closest('.edition-row');
-        const journalFields = editionRow.querySelectorAll('.journal-only');
-        journalFields.forEach(field => {
-            field.style.display = e.target.checked ? 'none' : 'block';
-        });
-    } f
-});
+const fieldLabels = {
+    corpus: 'Corpus',
+    volume: 'Volume',
+    number_inscription: 'Inscription number',
+    publication_year: 'Publication year',
+    corpus_page: 'Corpus page',
+    last_name_author: "Author's last name",
+    link: "Link to external resource",
+};
 
-function addEdition() {
-    editionCount++;
-    const container = document.getElementById('editions-container');
+const fieldTypes = {
+    corpus: 'text',
+    volume: 'number',
+    number_inscription: 'number',
+    publication_year: 'number',
+    corpus_page: 'number',
+    last_name_author: 'text',
+    link: 'text',
+};
 
-    const divEdition = document.createElement('div');
-    divEdition.classList.add('row', 'mb-3', 'edition-row', 'align-items-center', 'border', 'border-warning-subtle', 'rounded-4', 'p-3');
-    divEdition.id = `edition-${editionCount}`;
-    divEdition.innerHTML = `
-    <div class="col-12 mb-3">
-        <div class="form-check form-switch">
-            <input class="form-check-input edition-type-switch" type="checkbox" role="switch" id="switch${editionCount}" checked>
-            <label class="form-check-label" for="switch${editionCount}">Corpus (checked) / Journal (unchecked)</label>
+function getExistingEditions() {
+    return JSON.parse(container.dataset.editions || '[]');
+}
+
+function createTypeSelector(index, selectedType) {
+    return `
+        <div class="col-12 mb-3">
+            <label class="form-label">Select edition type</label>
+            <select class="form-select edition-type-select" name="editions[${index}][edition_type]" data-index="${index}">
+                <option value="corpus" ${selectedType === 'corpus' ? 'selected' : ''}>Corpus</option>
+                <option value="journal" ${selectedType === 'journal' ? 'selected' : ''}>Journal</option>
+                <option value="book" ${selectedType === 'book' ? 'selected' : ''}>Book</option>
+            </select>
         </div>
-    </div>
-    <div class="col-3 mb-3">
-        <label for="corpus${editionCount}" class="form-label">Corpus or Journal</label>   
-        <input type="text" name="editions[${editionCount}][corpus]" class="form-control" id="corpus${editionCount}">
-    </div>
-
-    <div class="col-3 mb-3">
-        <label for="volume${editionCount}" class="form-label">Volume in arabic numbers</label>
-        <input type="number" name="editions[${editionCount}][volume]" class="form-control" id="volume${editionCount}">
-    </div>
-
-    <div class="col-3 mb-3">
-        <label for="number_inscription${editionCount}" class="form-label">Inscription number</label>  
-        <input type="number" name="editions[${editionCount}][number_inscription]" class="form-control" id="number_inscription${editionCount}">
-    </div>
-
-    <div class="col-3 mb-3 journal-only">
-        <label for="publication_year${editionCount}" class="form-label">Publication year for Journals</label> 
-        <input type="number" name="editions[${editionCount}][publication_year]" class="form-control" id="publication_year${editionCount}">
-    </div>
-
-    <div class="col-3 mb-3 journal-only">
-        <label for="corpus_page${editionCount}" class="form-label">Corpus page for Journals</label>
-        <input type="number" name="editions[${editionCount}][corpus_page]" class="form-control" id="corpus_page${editionCount}">
-    </div>
-
-    <div class="col-3 mb-3 journal-only">
-        <label for="last_name_author${editionCount}" class="form-label">Author's last name</label>  
-        <input type="text" name="editions[${editionCount}][last_name_author]" class="form-control" id="last_name_author${editionCount}">
-    </div>
-
-    <div class="mb-3 journal-only">
-        <label for="edition_image">Printed edition</label>
-        <input type="file" name="editions[${editionCount}][edition_image]" id="edition_image" class="form-control journal-only">
-    </div>
-
-
-    <div class="col-3 mb-3 ms-5">
-    <button type="button" class="btn btn-danger remove-edition-btn">Delete edition</button>
-    </div>
     `;
-    container.appendChild(divEdition);
-    const journalFields = divEdition.querySelectorAll('.journal-only');
-    journalFields.forEach(field => {
-        field.style.display = 'none';
+}
+
+function createField(index, fieldName, value = '') {
+    const isRequired = fieldName === 'corpus' ? 'required' : '';
+    const requiredStar = fieldName === 'corpus' ? '<span class="text-danger">*</span>' : '';
+    return `
+        <div class="col-3 mb-3 edition-field" data-field="${fieldName}">
+            <label class="form-label">${fieldLabels[fieldName]} ${requiredStar}</label>
+            <input 
+                type="${fieldTypes[fieldName]}" 
+                name="editions[${index}][${fieldName}]" 
+                class="form-control" 
+                id="${fieldName}${index}"
+                value="${value}"
+                ${isRequired}
+            >
+        </div>
+    `;
+}
+
+function createImageField(index, existingImage = null) {
+    const currentFile = existingImage
+        ? `<p class="text-muted small">Current file: <a href="/storage/${existingImage}" target="_blank">View</a></p>`
+        : '';
+    return `
+        <div class="col-12 mb-3 edition-field" data-field="edition_image">
+            <label class="form-label">Printed edition</label>
+            ${currentFile}
+            <input type="file" name="editions[${index}][edition_image]" class="form-control">
+        </div>
+    `;
+}
+
+function createHiddenId(index, id = null) {
+    return id ? `<input type="hidden" name="editions[${index}][id]" value="${id}">` : '';
+}
+
+function createDeleteButton() {
+    return `
+        <div class="col-12 mb-3">
+            <button type="button" class="btn btn-danger remove-edition-btn">Delete edition</button>
+        </div>
+    `;
+}
+
+function buildEditionRow(index, type, fieldValues = {}, id = null) {
+    const allFields = ['corpus', 'volume', 'number_inscription', 'publication_year', 'corpus_page', 'last_name_author', 'link'];
+    const fieldsHtml = allFields.map(field => createField(index, field, fieldValues[field] || '')).join('');
+
+    return `
+        <div class="row mb-3 edition-row align-items-center border border-warning-subtle rounded-4 p-3" id="edition-${index}">
+            ${createTypeSelector(index, type)}
+            ${fieldsHtml}
+            ${createImageField(index, fieldValues.edition_image || null)}
+            ${createHiddenId(index, id)}
+            ${createDeleteButton()}
+        </div>
+    `;
+}
+
+function renderEdition(index, type, fieldValues = {}, id = null) {
+    container.insertAdjacentHTML('beforeend', buildEditionRow(index, type, fieldValues, id));
+}
+
+function updateFieldsForType(editionRow, type, index) {
+    const allFields = editionRow.querySelectorAll('.edition-field[data-field]');
+    const activeFields = fieldsByType[type];
+
+    allFields.forEach(field => {
+        const fieldName = field.dataset.field;
+        if (fieldName === 'edition_image') return;
+
+        const isActive = activeFields.includes(fieldName);
+        field.style.display = isActive ? 'block' : 'none';
+        field.querySelectorAll('input').forEach(input => {
+            input.disabled = !isActive;
+        });
     });
 }
 
+function initExistingEditions() {
+    const existing = getExistingEditions();
+    console.log(existing);
+    existing.forEach(edition => {
+        editionCount++;
+         console.log('type:', edition.edition_type);
+        renderEdition(editionCount, edition.edition_type || 'corpus', edition, edition.id);
+        const row = document.getElementById(`edition-${editionCount}`);
+        updateFieldsForType(row, edition.edition_type || 'corpus', editionCount);
+    });
+}
 
-// Expose functions to global scope for inline onclick handlers
+function handleTypeChange(e) {
+    if (!e.target.classList.contains('edition-type-select')) return;
+    const index = e.target.dataset.index;
+    const type = e.target.value;
+    const editionRow = document.getElementById(`edition-${index}`);
+    updateFieldsForType(editionRow, type, index);
+}
+
+function handleRemove(e) {
+    if (!e.target.classList.contains('remove-edition-btn')) return;
+    e.target.closest('.edition-row').remove();
+}
+
+function handleAddEdition() {
+    editionCount++;
+    renderEdition(editionCount, 'corpus');
+    const row = document.getElementById(`edition-${editionCount}`);
+    updateFieldsForType(row, 'corpus', editionCount);
+}
+
+document.getElementById('add-edition-btn').addEventListener('click', handleAddEdition);
+container.addEventListener('click', handleRemove);
+container.addEventListener('change', handleTypeChange);
+
+initExistingEditions();

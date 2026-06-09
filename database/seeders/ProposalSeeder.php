@@ -30,6 +30,7 @@ class ProposalSeeder extends Seeder
             $newProposal->religion= $faker->randomElement(['pagan', 'uncertain', 'christian']);
             $newProposal->status = $faker->randomElement(['pending', 'approved', 'rejected']);
             $newProposal->rejection_notes = $newProposal->status === 'rejected' ? $faker->paragraphs(2, true) : null;
+            $newProposal->private_notes = $faker->sentence();
             $newProposal->proposed_by = $faker->numberBetween(1, 100);
             $newProposal->approved_by = $newProposal->status === 'pending' ? null : $faker->numberBetween(1, 100);
             $newProposal->filing_id = $faker->boolean(50) ? $faker->numberBetween(1, 150) : null;

@@ -14,10 +14,12 @@ class Edition extends Model
         'corpus',
         'volume',
         'number_inscription',
+        'edition_type',
         'publication_year',
         'corpus_page',
         'last_name_author',
         'edition_image',
+        'link',
     ];
 
     public function editionable()

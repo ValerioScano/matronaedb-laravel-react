@@ -15,7 +15,7 @@ function DetailPage() {
       .get(`http://127.0.0.1:8000/api/filings/${id}`)
       .then((response) => {
         console.log(response.data);
-        setInscription(response.data.data);
+        setInscription(response.data);
       })
       .catch((err) => {
         console.error("errore", err.message);
@@ -54,12 +54,12 @@ function DetailPage() {
               {inscription.editions?.map((edition, i) => {
                 return (
                   <li key={i}>
-                    {edition.corpus} {edition.volume}{" "}
-                    {edition.number_inscription}
-                    {edition.last_name_author && `, ${edition.last_name_author}`}
-                    {edition.publication_year &&
-                      ` (${edition.publication_year})`}
-                    {edition.corpus_page && `, p. ${edition.corpus_page}`}
+                    {edition?.corpus} {edition?.volume}{" "}
+                    {edition?.number_inscription}
+                    {edition?.last_name_author && `, ${edition?.last_name_author}`}
+                    {edition?.publication_year &&
+                      ` (${edition?.publication_year})`}
+                    {edition?.corpus_page && `, p. ${edition?.corpus_page}`}
                     ;
                   </li>
                 );

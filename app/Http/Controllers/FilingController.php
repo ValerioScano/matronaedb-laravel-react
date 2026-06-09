@@ -18,8 +18,15 @@ class FilingController extends Controller
     {
         $filing->load(['tags', 'editions']);
         $groupedTags = $filing->tags->groupBy('category');
+        $previousId = Filing::where('id', '<', $filing->id)
+            ->orderBy('id', 'desc')
+            ->value('id');
 
-        return view('pages.filings.show', compact('filing', 'groupedTags'));
+        $nextId = Filing::where('id', '>', $filing->id)
+            ->orderBy('id', 'asc')
+            ->value('id');
+
+        return view('pages.filings.show', compact('filing', 'groupedTags', 'previousId', 'nextId'));
     }
 
     public function destroy(Filing $filing)

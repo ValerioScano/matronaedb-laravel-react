@@ -6,6 +6,7 @@ use App\Models\Edition;
 use App\Models\Filing;
 use App\Models\Proposal;
 use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -26,8 +27,32 @@ class ProposalController extends Controller
     {
         $proposal->load(['editions']);
         $groupedTags = $proposal->tags->groupBy('category');
+        $filing = null;
+        $groupedTagsFiling = null;
 
-        return view('pages.proposals.show', compact('proposal', 'groupedTags'));
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($proposal->filing_id && $user?->isAdmin()) {
+            $filing = Filing::with(['editions', 'tags'])->find($proposal->filing_id);
+            $groupedTagsFiling = $filing->tags->groupBy('category');
+        }
+
+        $previousId = Proposal::when(! $user?->isAdmin(), function ($query) {
+            $query->where('proposed_by', Auth::id());
+        })
+            ->where('id', '<', $proposal->id)
+            ->orderBy('id', 'desc')
+            ->value('id');
+
+        $nextId = Proposal::when(! $user?->isAdmin(), function ($query) {
+            $query->where('proposed_by', Auth::id());
+        })
+            ->where('id', '>', $proposal->id)
+            ->orderBy('id', 'asc')
+            ->value('id');
+
+        return view('pages.proposals.show', compact('proposal', 'groupedTags', 'previousId', 'nextId', 'filing', 'groupedTagsFiling'));
     }
 
     /**
@@ -50,9 +75,10 @@ class ProposalController extends Controller
             'text' => 'required',
             'region' => 'required',
             'province' => 'required',
-            'min_year' => 'required|integer',
-            'max_year' => 'required|integer',
+            'editions.*.edition_type' => 'required_with:editions',
+
             'religion' => 'required|in:uncertain,pagan,christian',
+            'editions.*.corpus' => 'required_with:editions',
         ]);
         $data = $request->all();
 
@@ -67,6 +93,7 @@ class ProposalController extends Controller
         $proposal->is_sacred_dedication = array_key_exists('is_sacred_dedication', $data) ? 1 : 0;
         $proposal->religion = $data['religion'];
         $proposal->notes = $data['notes'] ?? null;
+        $proposal->private_notes = $data['private_notes'] ?? null;
         $proposal->proposed_by = Auth::id();
         $proposal->save();
 
@@ -77,9 +104,11 @@ class ProposalController extends Controller
                     'corpus' => $edition['corpus'] ?? null,
                     'volume' => $edition['volume'] ?? null,
                     'number_inscription' => $edition['number_inscription'] ?? null,
+                    'edition_type' => $edition['edition_type'] ?? null,
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'link' => $edition['link'] ?? null,
                 ];
 
                 if (array_key_exists('edition_image', $edition)) {
@@ -119,9 +148,10 @@ class ProposalController extends Controller
             'text' => 'required',
             'region' => 'required',
             'province' => 'required',
-            'min_year' => 'required|integer',
-            'max_year' => 'required|integer',
+            'editions.*.edition_type' => 'required_with:editions',
+
             'religion' => 'required|in:uncertain,pagan,christian',
+            'editions.*.corpus' => 'required_with:editions',
         ]);
         $data = $request->all();
 
@@ -136,6 +166,7 @@ class ProposalController extends Controller
         $proposal->is_sacred_dedication = array_key_exists('is_sacred_dedication', $data) ? 1 : 0;
         $proposal->religion = $data['religion'];
         $proposal->notes = $data['notes'] ?? null;
+        $proposal->private_notes = $data['private_notes'] ?? null;
         $proposal->status = 'pending';
         $proposal->save();
 
@@ -147,9 +178,11 @@ class ProposalController extends Controller
                     'corpus' => $edition['corpus'] ?? null,
                     'volume' => $edition['volume'] ?? null,
                     'number_inscription' => $edition['number_inscription'] ?? null,
+                    'edition_type' => $edition['edition_type'] ?? null,
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'link' => $edition['link'] ?? null,
                 ];
 
                 if (array_key_exists('edition_image', $edition)) {
@@ -176,6 +209,12 @@ class ProposalController extends Controller
             $proposal->tags()->sync($data['tags']);
         } else {
             $proposal->tags()->detach();
+        }
+
+        /** @var User $user */
+        $user = Auth::user();
+        if ($request->approve_after_edit && $user->isAdmin()) {
+            return $this->approve($proposal);
         }
 
         return redirect()->route('proposals.show', $proposal);
@@ -210,9 +249,10 @@ class ProposalController extends Controller
             'text' => 'required',
             'region' => 'required',
             'province' => 'required',
-            'min_year' => 'required|integer',
-            'max_year' => 'required|integer',
+            'editions.*.edition_type' => 'required_with:editions',
+
             'religion' => 'required|in:uncertain,pagan,christian',
+            'editions.*.corpus' => 'required_with:editions',
         ]);
         $data = $request->all();
 
@@ -230,6 +270,7 @@ class ProposalController extends Controller
         $proposal->is_sacred_dedication = array_key_exists('is_sacred_dedication', $data) ? 1 : 0;
         $proposal->religion = $data['religion'];
         $proposal->notes = $data['notes'] ?? null;
+        $proposal->private_notes = $data['private_notes'] ?? null;
         $proposal->save();
 
         // 2. Salva le edizioni
@@ -239,9 +280,11 @@ class ProposalController extends Controller
                     'corpus' => $edition['corpus'] ?? null,
                     'volume' => $edition['volume'] ?? null,
                     'number_inscription' => $edition['number_inscription'] ?? null,
+                    'edition_type' => $edition['edition_type'] ?? null,
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'link' => $edition['link'] ?? null,
                 ];
 
                 if (array_key_exists('edition_image', $edition)) {
@@ -310,10 +353,12 @@ class ProposalController extends Controller
                 'corpus' => $edition->corpus,
                 'volume' => $edition->volume,
                 'number_inscription' => $edition->number_inscription,
+                'edition_type' => $edition->edition_type,
                 'publication_year' => $edition->publication_year,
                 'corpus_page' => $edition->corpus_page,
                 'last_name_author' => $edition->last_name_author,
                 'edition_image' => $edition->edition_image,
+                'link' => $edition['link'] ?? null,
             ]);
         }
 

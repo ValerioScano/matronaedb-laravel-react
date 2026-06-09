@@ -104,6 +104,12 @@
                             to
                             consult your filing </div>
                     </div>
+
+                    <div class="col-12 mb-3">
+                            <label for="private_notes" class="form-label">Is there anything that the admin should
+                                know?</label>
+                            <textarea name="private_notes" id="private_notes" class="form-control">{{$proposal->private_notes}}</textarea>
+                        </div>
                 </div>
 
                 {{-- Sezione edizioni --}}
@@ -111,71 +117,17 @@
                 <div class="row align-items-center gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
                     <h4>Editions</h4>
                     <div class="col-12 my-3">
-                        <div id="editions-container">
-                            @foreach ($proposal->editions as $i => $edition)
-                                <div class="row mb-3 edition-row align-items-center border border-warning-subtle rounded-4 p-3"
-                                    id="edition-{{ $i }}">
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Corpus or Journal</label>
-                                        <input type="text" name="editions[{{ $i }}][corpus]"
-                                            class="form-control" value="{{ $edition->corpus }}">
-                                    </div>
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Volume in arabic numbers</label>
-                                        <input type="number" name="editions[{{ $i }}][volume]"
-                                            class="form-control" value="{{ $edition->volume }}">
-                                    </div>
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Inscription number</label>
-                                        <input type="number" name="editions[{{ $i }}][number_inscription]"
-                                            class="form-control" value="{{ $edition->number_inscription }}">
-                                    </div>
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Publication year</label>
-                                        <input type="number" name="editions[{{ $i }}][publication_year]"
-                                            class="form-control" value="{{ $edition->publication_year }}">
-                                    </div>
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Corpus page</label>
-                                        <input type="number" name="editions[{{ $i }}][corpus_page]"
-                                            class="form-control" value="{{ $edition->corpus_page }}">
-                                    </div>
-                                    <div class="col-3 mb-3">
-                                        <label class="form-label">Author's last name</label>
-                                        <input type="text" name="editions[{{ $i }}][last_name_author]"
-                                            class="form-control" value="{{ $edition->last_name_author }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="edition_image">Immagine edizione a stampa</label>
-                                        @if ($edition->edition_image)
-                                            <div class="mb-2">
-                                                <p class="text-muted small">Current file:
-                                                    <a href="{{ asset('storage/' . $edition->edition_image) }}"
-                                                        target="_blank" class="text-decoration-none">View</a>
-                                                </p>
-                                            </div>
-                                        @endif
-                                        <input type="file" name="editions[{{ $i }}][edition_image]"
-                                            id="edition_image_{{ $i }}" class="form-control">
-                                        <small class="form-text text-muted">Upload a new file to replace the existing
-                                            one</small>
-                                    </div>
-                                    {{-- hidden per passare l'id dell'edizione esistente --}}
-                                    <input type="hidden" name="editions[{{ $i }}][id]"
-                                        value="{{ $edition->id }}">
-                                    <div class="col-3 mb-3 ms-5">
-                                        <button type="button" class="btn btn-danger remove-edition-btn">Delete
-                                            edition</button>
-                                    </div>
-                                </div>
-                            @endforeach
+
+                        <div id="editions-container" data-editions='@json($proposal->editions)'>
+                            {{-- Edizioni recuperate qui --}}
                         </div>
+
                         <button type="button" class="btn btn-outline-primary" id="add-edition-btn">Add edition</button>
                     </div>
                 </div>
 
                 {{-- Sezione tags  --}}
-                
+
                 <div class="row gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
                     <h4 class="mb-4">Tags</h4>
 
@@ -200,6 +152,12 @@
                 <div class="col-12 mb-3">
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
+
+                {{-- Prevedo la casistica che admin possa modificare una proposal per approvarla direttamente --}}
+
+                @if (Auth::user()->isAdmin())
+                    <input type="hidden" name="approve_after_edit" value="1">
+                @endif
             </form>
         </div>
 

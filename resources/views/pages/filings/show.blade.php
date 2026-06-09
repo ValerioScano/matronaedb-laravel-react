@@ -1,9 +1,36 @@
 @extends('layouts.app')
+@section('scripts')
+    <script>
+        document.addEventListener('keydown', function(e) {
+            @if ($previousId)
+                if (e.key === 'ArrowLeft') {
+                    window.location.href = "{{ route('filings.show', $previousId) }}";
+                }
+            @endif
+            @if ($nextId)
+                if (e.key === 'ArrowRight') {
+                    window.location.href = "{{ route('filings.show', $nextId) }}";
+                }
+            @endif
+        });
+    </script>
+@endsection
+
 @section('content')
     <div class="container">
-        <div class="row">
-            <div class="col-12 text-center p-5">
+        <div class="row align-items-center">
+            <div class="col-2">
+                @if ($previousId)
+                    <a href="{{ route('filings.show', $previousId) }}" class="btn btn-outline-primary">← Previous</a>
+                @endif
+            </div>
+            <div class="col-8 text-center p-5">
                 <h1>Filing #{{ $filing->id }}</h1>
+            </div>
+            <div class="col-2">
+                @if ($nextId)
+                    <a href="{{ route('filings.show', $nextId) }}" class="btn btn-outline-primary">Next →</a>
+                @endif
             </div>
         </div>
 
@@ -40,7 +67,12 @@
                     <ul class="mb-0 ps-3">
                         @forelse($filing->formatBibliography() as $entry)
                             <li>
-                                {{ $entry['text'] }}
+                                @if ($entry['link'])
+                                <a href="{{$entry['link']}}" target="_blank">{{ $entry['text'] }}</a>
+                                @else {{$entry['text']}}
+                                @endif
+
+
                                 @if ($entry['image'])
                                     <a href="{{ asset('storage/' . $entry['image']) }}" target="_blank"
                                         class="btn btn-outline-primary btn-sm ms-1">View image</a>
@@ -67,6 +99,10 @@
                     <h5 class="mb-3">Text</h5>
                     <p class="mb-0">{{ $filing->text }}</p>
                 </div>
+            </div>
+
+            <div class="mt-3">
+                <p>Proposed by {{ $filing->proposedBy->last_name }} on {{ $filing->updated_at->format('d/m/Y') }}, approved by {{ $filing->ApprovedBy->last_name }}</p></p>
             </div>
 
         </div>
