@@ -111,24 +111,56 @@
                 </div>
             </div>
 
+            {{-- Sezione persone --}}
+
+            <div class="row align-items-center gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
+                <h4>People</h4>
+                <div class="col-12 my-3">
+                    <div id="people-container" data-people='[]'>
+                        {{-- Persone aggiunte qui --}}
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" id="add-person-btn">Add person</button>
+                </div>
+            </div>
+
             {{-- Sezione tags  --}}
 
             <div class="row gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
                 <h4 class="mb-4">Tags</h4>
 
-                @foreach ($groupedTags as $category => $tags)
+                @foreach ($pairedTags as $category => $pairs)
                     <div class="col-12 mb-4">
-                        <h6 class="fw-bold text-uppercase text-muted mb-3 border-bottom pb-2">{{ ucfirst($category) }}</h6>
-                        <div class="d-flex flex-wrap gap-3">
-                            @foreach ($tags as $tag)
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="tag_{{ $tag->id }}"
-                                        name="tags[]" value="{{ $tag->id }}" @checked(in_array($tag->id, old('tags', [])))>
-                                    <label class="form-check-label"
-                                        for="tag_{{ $tag->id }}">{{ $tag->label }}</label>
-                                </div>
-                            @endforeach
-                        </div>
+                        <h6 class="fw-bold text-uppercase text-muted mb-2 border-bottom pb-2">{{ ucfirst($category) }}</h6>
+                        <table class="table table-sm table-borderless mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="text-muted small fw-normal ps-0" style="width:50%">Certain</th>
+                                    <th class="text-muted small fw-normal" style="width:50%">Uncertain</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($pairs as $pair)
+                                    <tr>
+                                        <td class="ps-0 py-1">
+                                            <div class="form-check mb-0">
+                                                <input type="checkbox" class="form-check-input" id="tag_{{ $pair['base']->id }}"
+                                                    name="tags[]" value="{{ $pair['base']->id }}" @checked(in_array($pair['base']->id, old('tags', [])))>
+                                                <label class="form-check-label" for="tag_{{ $pair['base']->id }}">{{ $pair['base']->label }}</label>
+                                            </div>
+                                        </td>
+                                        <td class="py-1">
+                                            @if ($pair['uncertain'])
+                                                <div class="form-check mb-0">
+                                                    <input type="checkbox" class="form-check-input" id="tag_{{ $pair['uncertain']->id }}"
+                                                        name="tags[]" value="{{ $pair['uncertain']->id }}" @checked(in_array($pair['uncertain']->id, old('tags', [])))>
+                                                    <label class="form-check-label" for="tag_{{ $pair['uncertain']->id }}">{{ $pair['uncertain']->label }}</label>
+                                                </div>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 @endforeach
             </div>

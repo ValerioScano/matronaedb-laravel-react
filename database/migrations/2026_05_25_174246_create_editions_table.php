@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('corpus')->index();
             $table->tinyInteger('volume')->nullable()->index();
-            $table->mediumInteger('number_inscription')->nullable()->index();
+            $table->string('number_inscription')->nullable()->index();
             $table->unsignedSmallInteger('publication_year')->nullable();
             $table->mediumInteger('corpus_page')->nullable();
             $table->string('last_name_author')->nullable();

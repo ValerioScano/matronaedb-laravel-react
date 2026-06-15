@@ -18,7 +18,6 @@
     <!-- Usando Vite -->
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 
-    @yield('scripts')
 </head>
 
 <body>
@@ -67,8 +66,7 @@
                                     </a>
 
                                     <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                        <a class="dropdown-item"
-                                            href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
+                                        <a class="dropdown-item" href="{{ route('dashboard') }}">{{ __('Dashboard') }}</a>
                                         <a class="dropdown-item"
                                             href="{{ route('profile.edit') }}">{{ __('Profile') }}</a>
                                         <a class="dropdown-item" href="{{ route('logout') }}"
@@ -95,6 +93,8 @@
             @yield('content')
         </main>
     </div>
+
+    @yield('scripts')
 </body>
 
 </html>

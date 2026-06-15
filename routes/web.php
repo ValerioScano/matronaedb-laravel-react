@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Route;
 // Welcome
 Route::view('/', 'pages.welcome')->name('welcome');
 
+Route::view('/esercizio', 'pages.esercizio');
+
 // Dashboard
 Route::get('/dashboard', [ProfileController::class, 'dashboard'])
     ->middleware(['auth', 'verified'])

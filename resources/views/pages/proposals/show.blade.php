@@ -18,7 +18,7 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="{{ $filing ? 'col-6' : 'col-12' }}">
+            <div class="{{$filing ? 'col-6' : 'col-12' }}">
                 <div class="row align-items-center">
                     <div class="col-2">
                         @if ($previousId)
@@ -28,17 +28,28 @@
                     </div>
                     <div class="col-8 text-center p-5">
                         <h1>
-                            @if ($filing)
-                                Revision on filing #{{ $filing->id }}
-                            @else
-                                Filing proposal #{{ $proposal->id }}
-                            @endif
+                            <h1>
+                                @if ($proposal->trashed())
+                                    Deleted proposal #{{$proposal->id}} 
+                                @elseif($filing)
+                                    Revision on filing #{{ $filing->id }}
+                                @elseif($proposal->status === 'approved' && $proposal->filing_id)
+                                    Creation of filing #{{ $proposal->filing_id }}
+                                @else
+                                    Filing proposal #{{ $proposal->id }}
+                                @endif
+                            </h1>
                             <span
-                                class="badge 
-                        @if ($proposal->status === 'approved') bg-success
-                        @elseif($proposal->status === 'rejected') bg-danger
-                        @else bg-warning text-dark @endif fs-6 align-middle">
-                                {{ ucfirst($proposal->status) }}
+                                class="badge align-middle
+    @if ($proposal->trashed()) bg-danger fs-3
+    @elseif($proposal->status === 'approved') fs-5 bg-success
+    @elseif($proposal->status === 'rejected') fs-5 bg-danger
+    @else bg-warning text-dark @endif">
+                                @if ($proposal->trashed())
+                                    Deleted
+                                @else
+                                    {{ ucfirst($proposal->status) }}
+                                @endif
                             </span>
                         </h1>
                     </div>
@@ -76,6 +87,20 @@
                                 </div>
                             @empty
                                 <span class="text-muted">Nessun tag</span>
+                            @endforelse
+                        </div>
+
+                        <div class="p-3 border rounded-3">
+                            <h5 class="mb-3">People</h5>
+                            @forelse($proposal->people as $person)
+                                <div class="mb-2">
+                                    <span>{{ implode(' ', array_filter([$person->praenomen, $person->nomen, $person->cognomen])) }}</span>
+                                    @if ($person->TM_PER_id)
+                                        <span class="text-muted small ms-1">(TM {{ $person->TM_PER_id }})</span>
+                                    @endif
+                                </div>
+                            @empty
+                                <span class="text-muted">No people recorded</span>
                             @endforelse
                         </div>
 
@@ -154,7 +179,7 @@
                         @endif
 
                     </div>
-                    @if (Auth::user()->role === 'admin')
+                    @if (Auth::user()->role === 'admin' && $proposal->status === 'pending')
                         <div class="col-12 d-flex flex-wrap gap-2">
                             <form action="{{ route('proposals.approve', $proposal) }}" method="POST">
                                 @csrf
@@ -249,6 +274,20 @@
                             </div>
 
                             <div class="p-3 border rounded-3">
+                                <h5 class="mb-3">People</h5>
+                                @forelse($filing->people as $person)
+                                    <div class="mb-2">
+                                        <span>{{ implode(' ', array_filter([$person->praenomen, $person->nomen, $person->cognomen])) }}</span>
+                                        @if ($person->TM_PER_id)
+                                            <span class="text-muted small ms-1">(TM {{ $person->TM_PER_id }})</span>
+                                        @endif
+                                    </div>
+                                @empty
+                                    <span class="text-muted">No people recorded</span>
+                                @endforelse
+                            </div>
+
+                            <div class="p-3 border rounded-3">
                                 <h5 class="mb-2">Datation</h5>
                                 <p class="mb-0">{{ $filing->datation }}</p>
                             </div>
@@ -262,15 +301,17 @@
                                 <h5 class="mb-2">Bibliography</h5>
                                 <ul class="mb-0 ps-3">
                                     <li>
-                                        @if ($entry['link'])
-                                            <a href="{{ $entry['link'] }}" target="_blank">{{ $entry['text'] }}</a>
-                                        @else
-                                            {{ $entry['text'] }}
-                                        @endif
-                                        @if ($entry['image'])
-                                            <a href="{{ asset('storage/' . $entry['image']) }}" target="_blank"
-                                                class="btn btn-outline-primary btn-sm ms-1">View image</a>
-                                        @endif
+                                        @foreach ($filing->formatBibliography() as $entry)
+                                            @if ($entry['link'])
+                                                <a href="{{ $entry['link'] }}" target="_blank">{{ $entry['text'] }}</a>
+                                            @else
+                                                {{ $entry['text'] }}
+                                            @endif
+                                            @if ($entry['image'])
+                                                <a href="{{ asset('storage/' . $entry['image']) }}" target="_blank"
+                                                    class="btn btn-outline-primary btn-sm ms-1">View image</a>
+                                            @endif
+                                        @endforeach
                                     </li>
                                 </ul>
                                 @if ($filing->editions->isEmpty())

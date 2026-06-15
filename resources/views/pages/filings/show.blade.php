@@ -25,7 +25,10 @@
                 @endif
             </div>
             <div class="col-8 text-center p-5">
-                <h1>Filing #{{ $filing->id }}</h1>
+                <h1>Filing #{{ $filing->id }} @if ($filing->trashed())
+                        <span class="badge bg-danger">Deleted</span>
+                    @endif
+                </h1>
             </div>
             <div class="col-2">
                 @if ($nextId)
@@ -53,6 +56,20 @@
                 </div>
 
                 <div class="p-3 border rounded-3">
+                    <h5 class="mb-3">People</h5>
+                    @forelse($filing->people as $person)
+                        <div class="mb-2">
+                            <span>{{ implode(' ', array_filter([$person->praenomen, $person->nomen, $person->cognomen])) }}</span>
+                            @if ($person->TM_PER_id)
+                                <span class="text-muted small ms-1">(TM {{ $person->TM_PER_id }})</span>
+                            @endif
+                        </div>
+                    @empty
+                        <span class="text-muted">No people recorded</span>
+                    @endforelse
+                </div>
+
+                <div class="p-3 border rounded-3">
                     <h5 class="mb-2">Datation</h5>
                     <p class="mb-0">{{ $filing->datation }}</p>
                 </div>
@@ -68,8 +85,9 @@
                         @forelse($filing->formatBibliography() as $entry)
                             <li>
                                 @if ($entry['link'])
-                                <a href="{{$entry['link']}}" target="_blank">{{ $entry['text'] }}</a>
-                                @else {{$entry['text']}}
+                                    <a href="{{ $entry['link'] }}" target="_blank">{{ $entry['text'] }}</a>
+                                @else
+                                    {{ $entry['text'] }}
                                 @endif
 
 
@@ -102,7 +120,9 @@
             </div>
 
             <div class="mt-3">
-                <p>Proposed by {{ $filing->proposedBy->last_name }} on {{ $filing->updated_at->format('d/m/Y') }}, approved by {{ $filing->ApprovedBy->last_name }}</p></p>
+                <p>Proposed by {{ $filing->proposedBy->last_name }} on {{ $filing->updated_at->format('d/m/Y') }},
+                    approved by {{ $filing->ApprovedBy->last_name }}</p>
+                </p>
             </div>
 
         </div>

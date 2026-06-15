@@ -1,0 +1,72 @@
+@font-face {
+    font-family: 'IFAOGrec';
+    src: url('/fonts/IFAOGrec.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    font-family: 'IFAOGrec', serif;
+}
+
+.ifao-text {
+    font-size: 1.1rem;
+}
+
+.ifao-keyboard {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem 0.75rem;
+    background: #f8f9fa;
+    margin-top: 0.375rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.ifao-keyboard-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ifao-keyboard-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #6c757d;
+    font-family: sans-serif;
+}
+
+.ifao-keyboard-keys {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.ifao-keyboard-keys button {
+    min-width: 2.5rem;
+    height: 2.5rem;
+    padding: 0 0.25rem;
+    font-size: 1.1rem;
+    font-family: 'IFAOGrec', serif;
+    background: #fff;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, border-color 0.15s;
+    line-height: 1;
+}
+
+.ifao-keyboard-keys button:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.ifao-keyboard-keys button:active {
+    background: #dee2e6;
+}

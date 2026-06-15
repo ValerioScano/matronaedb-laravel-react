@@ -18,14 +18,17 @@ class ProposalController extends Controller
      */
     public function index()
     {
-        $user_proposals = Proposal::where('proposed_by', Auth::id())->orderBy('updated_at', 'desc')->paginate(20);
+        $user_proposals = Proposal::withTrashed()->where('proposed_by', Auth::id())->orderBy('updated_at', 'desc')->paginate(20);
 
         return view('pages.proposals.index', compact('user_proposals'));
     }
 
-    public function show(Proposal $proposal)
+    public function show(int $id)
     {
-        $proposal->load(['editions']);
+        $proposal = Proposal::withTrashed()->findOrFail($id);
+        $proposal->load(['editions' => function ($query) {
+            $query->withTrashed();
+        }, 'people']);
         $groupedTags = $proposal->tags->groupBy('category');
         $filing = null;
         $groupedTagsFiling = null;
@@ -33,8 +36,8 @@ class ProposalController extends Controller
         /** @var User $user */
         $user = Auth::user();
 
-        if ($proposal->filing_id && $user?->isAdmin()) {
-            $filing = Filing::with(['editions', 'tags'])->find($proposal->filing_id);
+        if ($proposal->filing_id && $proposal->status === 'pending' && $user?->isAdmin()) {
+            $filing = Filing::withTrashed()->with(['editions', 'tags', 'people'])->find($proposal->filing_id);
             $groupedTagsFiling = $filing->tags->groupBy('category');
         }
 
@@ -60,10 +63,9 @@ class ProposalController extends Controller
      */
     public function create()
     {
-        $tags = Tag::all();
-        $groupedTags = $tags->groupBy('category');
+        $pairedTags = $this->buildTagPairs(Tag::all());
 
-        return view('pages.proposals.create', compact('groupedTags'));
+        return view('pages.proposals.create', compact('pairedTags'));
     }
 
     /**
@@ -119,7 +121,19 @@ class ProposalController extends Controller
             }
         }
 
-        // 3. Salva i tags
+        // 3. Salva le persone
+        if (array_key_exists('people', $data)) {
+            foreach ($data['people'] as $personData) {
+                $proposal->people()->create([
+                    'praenomen'  => $personData['praenomen'] ?? null,
+                    'nomen'      => $personData['nomen'] ?? null,
+                    'cognomen'   => $personData['cognomen'] ?? null,
+                    'TM_PER_id'  => $personData['TM_PER_id'] ?? null,
+                ]);
+            }
+        }
+
+        // 4. Salva i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         }
@@ -132,11 +146,10 @@ class ProposalController extends Controller
      */
     public function edit(Proposal $proposal)
     {
-        $proposal->load('editions');
-        $tags = Tag::all();
-        $groupedTags = $tags->groupBy('category');
+        $proposal->load(['editions', 'people']);
+        $pairedTags = $this->buildTagPairs(Tag::all());
 
-        return view('pages.proposals.edit', compact('proposal', 'groupedTags'));
+        return view('pages.proposals.edit', compact('proposal', 'pairedTags'));
     }
 
     /**
@@ -204,7 +217,20 @@ class ProposalController extends Controller
                 }
             }
         }
-        // 3. Aggiorna i tags
+        // 3. Aggiorna le persone
+        $proposal->people()->delete();
+        if (array_key_exists('people', $data)) {
+            foreach ($data['people'] as $personData) {
+                $proposal->people()->create([
+                    'praenomen'  => $personData['praenomen'] ?? null,
+                    'nomen'      => $personData['nomen'] ?? null,
+                    'cognomen'   => $personData['cognomen'] ?? null,
+                    'TM_PER_id'  => $personData['TM_PER_id'] ?? null,
+                ]);
+            }
+        }
+
+        // 4. Aggiorna i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         } else {
@@ -227,7 +253,9 @@ class ProposalController extends Controller
                 Storage::delete($edition->edition_image);
             }
         }
+
         $proposal->editions()->delete();
+        $proposal->people()->delete();
         $proposal->tags()->detach();
         $proposal->delete();
 
@@ -236,11 +264,10 @@ class ProposalController extends Controller
 
     public function createRevision(Filing $filing)
     {
-        $filing->load('editions');
-        $tags = Tag::all();
-        $groupedTags = $tags->groupBy('category');
+        $filing->load(['editions', 'people']);
+        $pairedTags = $this->buildTagPairs(Tag::all());
 
-        return view('pages.proposals.create_revision', compact('filing', 'groupedTags'));
+        return view('pages.proposals.create_revision', compact('filing', 'pairedTags'));
     }
 
     public function storeRevision(Request $request, Filing $filing)
@@ -295,7 +322,19 @@ class ProposalController extends Controller
             }
         }
 
-        // 3. Salva i tags
+        // 3. Salva le persone
+        if (array_key_exists('people', $data)) {
+            foreach ($data['people'] as $personData) {
+                $proposal->people()->create([
+                    'praenomen'  => $personData['praenomen'] ?? null,
+                    'nomen'      => $personData['nomen'] ?? null,
+                    'cognomen'   => $personData['cognomen'] ?? null,
+                    'TM_PER_id'  => $personData['TM_PER_id'] ?? null,
+                ]);
+            }
+        }
+
+        // 4. Salva i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         }
@@ -306,7 +345,7 @@ class ProposalController extends Controller
     /**
      * Display list of all proposals.
      */
-    public function pending(Proposal $proposal)
+    public function pending()
     {
         $user_proposals = Proposal::where('status', 'pending')->orderBy('created_at', 'desc')->paginate(20);
 
@@ -362,12 +401,24 @@ class ProposalController extends Controller
             ]);
         }
 
-        // 4. Copia i tags
+        // 4. Copia le persone
+        $filing->people()->delete();
+        foreach ($proposal->people as $person) {
+            $filing->people()->create([
+                'praenomen' => $person->praenomen,
+                'nomen'     => $person->nomen,
+                'cognomen'  => $person->cognomen,
+                'TM_PER_id' => $person->TM_PER_id,
+            ]);
+        }
+
+        // 5. Copia i tags
         $filing->tags()->sync($proposal->tags->pluck('id'));
 
-        // 5. Aggiorna lo stato della proposal
+        // 6. Aggiorna lo stato della proposal
         $proposal->status = 'approved';
         $proposal->approved_by = Auth::id();
+        $proposal->filing_id = $filing->id;
         $proposal->save();
 
         return redirect()->route('proposals.pending');

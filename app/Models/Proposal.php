@@ -43,4 +43,9 @@ class Proposal extends Model
     {
         return $this->morphMany(Edition::class, 'editionable');
     }
+
+    public function people():MorphMany
+    {
+        return $this->morphMany(Person::class, 'peopleable');
+    }
 }

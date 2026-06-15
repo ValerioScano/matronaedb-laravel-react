@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ProposalSeeder::class,
             TaggableSeeder::class,
             EditionsSeeder::class,
+            PeopleSeeder::class,
         ]);
     }
 }

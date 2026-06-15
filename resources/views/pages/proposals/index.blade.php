@@ -26,7 +26,12 @@
                     @foreach ($user_proposals as $user_proposal)
                         <tr>
                             <th scope="row">{{ $user_proposal->id }}</th>
-                            <td>{{$user_proposal->status}}</td>
+                            <td>@if ($user_proposal->trashed())
+                                Filing deleted
+                                @else
+                                {{ucfirst($user_proposal->status)}}
+                                @endif
+                            </td>
                             <td>
                                 <ul>
                                     @foreach ($user_proposal->formatBibliography() as $entry)
@@ -38,7 +43,7 @@
                             <td>{{ $user_proposal->location}}</td>
                             <td>{{ $user_proposal->textTruncate() }}</td>
                             <td>{{ $user_proposal->datation }}</td>
-                            <td><a href="{{route('proposals.show', $user_proposal->id)}}" class="btn btn-primary">See details</a></td>
+                            <td><a href="{{route('proposals.show', $user_proposal->id)}}" class="btn btn-primary btn-sm">Details</a></td>
                         </tr>
                     @endforeach
                 </tbody>

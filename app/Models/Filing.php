@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Filing extends Model
 {
-    use SoftDeletes; 
+    use SoftDeletes;
     use HasBibliography;
     use HasOrigin;
     use HasDatation;
@@ -21,6 +21,10 @@ class Filing extends Model
 
     public function editions(): MorphMany {
         return $this->morphMany(Edition::class, 'editionable');
+    }
+
+    public function people(): MorphMany {
+        return $this->morphMany(Person::class, 'peopleable');
     }
 
     public function tags() : MorphToMany {

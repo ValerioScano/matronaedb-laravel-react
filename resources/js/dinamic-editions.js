@@ -20,7 +20,7 @@ const fieldLabels = {
 const fieldTypes = {
     corpus: 'text',
     volume: 'number',
-    number_inscription: 'number',
+    number_inscription: 'text',
     publication_year: 'number',
     corpus_page: 'number',
     last_name_author: 'text',
@@ -154,8 +154,9 @@ function handleAddEdition() {
     updateFieldsForType(row, 'corpus', editionCount);
 }
 
-document.getElementById('add-edition-btn').addEventListener('click', handleAddEdition);
-container.addEventListener('click', handleRemove);
-container.addEventListener('change', handleTypeChange);
-
-initExistingEditions();
+if (container && document.getElementById('add-edition-btn')) {
+    document.getElementById('add-edition-btn').addEventListener('click', handleAddEdition);
+    container.addEventListener('click', handleRemove);
+    container.addEventListener('change', handleTypeChange);
+    initExistingEditions();
+}
