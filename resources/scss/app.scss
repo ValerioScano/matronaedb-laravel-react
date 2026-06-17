@@ -70,3 +70,10 @@ body {
 .ifao-keyboard-keys button:active {
     background: #dee2e6;
 }
+
+@media (min-width: 992px) {
+    .border-lg-start {
+        border-left: 1px solid #dee2e6 !important;
+        border-top: 0 !important;
+    }
+}

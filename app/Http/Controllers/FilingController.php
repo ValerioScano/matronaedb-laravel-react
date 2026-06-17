@@ -109,7 +109,7 @@ class FilingController extends Controller
 
     public function show(Filing $filing)
     {
-        $filing->load(['tags', 'editions', 'people']);
+        $filing->load(['tags', 'editions', 'people', 'externalResources']);
         $groupedTags = $filing->tags->groupBy('category');
         $previousId = Filing::where('id', '<', $filing->id)
             ->orderBy('id', 'desc')
@@ -136,6 +136,7 @@ class FilingController extends Controller
 
         $filing->editions()->delete();
         $filing->people()->delete();
+        $filing->externalResources()->delete();
         $filing->tags()->detach();
         $filing->delete();
 

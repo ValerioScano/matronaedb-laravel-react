@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\ExternalResource;
 
 class Filing extends Model
 {
@@ -25,6 +26,10 @@ class Filing extends Model
 
     public function people(): MorphMany {
         return $this->morphMany(Person::class, 'peopleable');
+    }
+
+    public function externalResources(): MorphMany {
+        return $this->morphMany(ExternalResource::class, 'external_resourceable');
     }
 
     public function tags() : MorphToMany {

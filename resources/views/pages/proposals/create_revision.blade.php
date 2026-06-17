@@ -26,38 +26,38 @@
 
                 {{-- Localizzazione iscrizione --}}
 
-                <div class="col-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <label for="region" class="form-label">Region <span class="text-danger">*</span></label>
                     <input name="region" type="text" class="form-control" id="region" required autocomplete="off"
                         value="{{ old('region', $filing->region) }}">
                 </div>
 
-                <div class="col-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <label for="province" class="form-label">Province <span class="text-danger">*</span></label>
                     <input name="province" type="text" class="form-control" id="province" required
                         value="{{ old('province', $filing->province) }}">
                 </div>
 
-                <div class="col-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <label for="city" class="form-label">City</label>
                     <input name="city" type="text" class="form-control" id="city"
                         value="{{ old('city', $filing->city) }}">
                 </div>
 
                 {{-- datazione iscrizione --}}
-                <div class="col-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <label for="min_year" class="form-label">Earliest datation</label>
                     <input name="min_year" type="number" class="form-control" id="min_year"
                         value="{{ old('min_year', $filing->min_year) }}">
                 </div>
 
-                <div class="col-4 mb-3">
+                <div class="col-12 col-md-4 mb-3">
                     <label for="max_year" class="form-label">Latest datation</label>
                     <input name="max_year" type="number" class="form-control" id="max_year"
                         value="{{ old('max_year', $filing->max_year) }}">
                 </div>
 
-                <div class="col-4 mb-3 form-check">
+                <div class="col-12 col-md-4 mb-3 form-check">
                     <input name="is_certain_date" type="checkbox" class="form-check-input" id="is_certain_date"
                         @checked(old('is_certain_date', $filing->is_certain_date))>
                     <label for="is_certain_date" class="form-check-label">Is the datation sure within a 50 years
@@ -66,14 +66,14 @@
 
                 {{-- Religione --}}
 
-                <div class="col-6 mb-3 form-check">
+                <div class="col-12 col-md-6 mb-3 form-check">
                     <input name="is_sacred_dedication" type="checkbox" class="form-check-input" id="is_sacred_dedication"
                         @checked(old('is_sacred_dedication', $filing->is_sacred_dedication))>
                     <label for="is_sacred_dedication" class="form-check-label">Is the inscription a sacred
                         dedication?</label>
                 </div>
 
-                <div class="col-6 mb-3">
+                <div class="col-12 col-md-6 mb-3">
                     <label for="religion">Religion:</label>
                     <select name="religion" class="form-select" id="religion">
                         <option value="uncertain" @selected(old('religion', $filing->religion) === 'uncertain')>Uncertain</option>
@@ -122,6 +122,18 @@
                         {{-- Persone recuperate qui --}}
                     </div>
                     <button type="button" class="btn btn-outline-primary" id="add-person-btn">Add person</button>
+                </div>
+            </div>
+
+            {{-- Sezione risorse esterne --}}
+
+            <div class="row align-items-center gx-5 my-2 p-4 border border-primary-subtle border-opacity-25 rounded-4">
+                <h4>External resources</h4>
+                <div class="col-12 my-3">
+                    <div id="external-resources-container" data-external-resources='@json($filing->externalResources)'>
+                        {{-- Risorse esterne recuperate qui --}}
+                    </div>
+                    <button type="button" class="btn btn-outline-primary" id="add-external-resource-btn">Add external resource</button>
                 </div>
             </div>
 

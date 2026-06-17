@@ -11,6 +11,7 @@
         </div>
 
         <div class="row">
+            <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
@@ -106,6 +107,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             {{ $users->links('pagination::bootstrap-5') }}
         </div>
     </div>

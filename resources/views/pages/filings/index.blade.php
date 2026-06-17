@@ -35,22 +35,30 @@
                         <h5>Text search</h5>
                         <div id="search-rows-container" data-count="{{ count($searchRows) }}">
                             @foreach ($searchRows as $i => $row)
-                                <div class="search-row d-flex gap-2 align-items-center mb-2">
-                                    <input type="text" name="search[{{ $i }}][term]" class="form-control"
-                                        placeholder="Search term..." value="{{ $row['term'] ?? '' }}">
-                                    <input type="number" name="search[{{ $i }}][within]" class="form-control w-25"
-                                        placeholder="Within n chars from start" value="{{ $row['within'] ?? '' }}">
-                                    <select name="search[{{ $i }}][operator]" class="form-select w-25">
-                                        <option value="AND" @selected(($row['operator'] ?? 'AND') === 'AND')>AND</option>
-                                        <option value="OR" @selected(($row['operator'] ?? '') === 'OR')>OR</option>
-                                        <option value="NOT" @selected(($row['operator'] ?? '') === 'NOT')>NOT</option>
-                                    </select>
-                                    <div class="form-check form-switch mb-0 text-nowrap">
+                                <div class="search-row row g-2 align-items-center mb-2">
+                                    <div class="col-6 col-md-2">
+                                        <select name="search[{{ $i }}][operator]" class="form-select">
+                                            <option value="AND" @selected(($row['operator'] ?? 'AND') === 'AND')>AND</option>
+                                            <option value="OR" @selected(($row['operator'] ?? '') === 'OR')>OR</option>
+                                            <option value="NOT" @selected(($row['operator'] ?? '') === 'NOT')>NOT</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md">
+                                        <input type="text" name="search[{{ $i }}][term]" class="form-control"
+                                            placeholder="Search string..." value="{{ $row['term'] ?? '' }}">
+                                    </div>
+                                    <div class="col-12 col-md-3">
+                                        <input type="number" name="search[{{ $i }}][within]" class="form-control"
+                                            placeholder="Within n chars from start" value="{{ $row['within'] ?? '' }}">
+                                    </div>
+                                    <div class="col-5 col-md-auto form-check form-switch mb-0">
                                         <input class="form-check-input" type="checkbox" name="search[{{ $i }}][exact]"
                                             id="exact_{{ $i }}" @checked(!empty($row['exact']))>
                                         <label class="form-check-label" for="exact_{{ $i }}">Exact</label>
                                     </div>
-                                    <button type="button" class="btn btn-outline-danger remove-search-row-btn">✕</button>
+                                    <div class="col-1 col-md-auto">
+                                        <button type="button" class="btn btn-outline-danger remove-search-row-btn">✕</button>
+                                    </div>
                                 </div>
                             @endforeach
                         </div>
@@ -59,20 +67,20 @@
 
 
                     {{-- Id & Datazione --}}
-                    <div class="row mb-4 align-items-center">
-                        <div class="col-1">
+                    <div class="row mb-4 align-items-center g-2">
+                        <div class="col-12 col-sm-2">
                             <label class="form-label">Filing ID</label>
                             <input type="number" name="id" class="form-control" value="{{ request('id') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-sm-4">
                             <label class="form-label">From year</label>
                             <input type="number" name="min_year" class="form-control" value="{{ request('min_year') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-sm-4">
                             <label class="form-label">To year</label>
                             <input type="number" name="max_year" class="form-control" value="{{ request('max_year') }}">
                         </div>
-                        <div class="col-2 form-check mt-4 ms-2">
+                        <div class="col-12 col-sm-2 form-check mt-sm-4 ms-sm-2">
                             <input type="checkbox" name="is_certain_date" class="form-check-input" id="is_certain_date"
                                 @checked(request('is_certain_date'))>
                             <label class="form-check-label" for="is_certain_date">Certain date</label>
@@ -80,32 +88,32 @@
                     </div>
 
                     {{-- Localizzazione --}}
-                    <div class="row mb-3">
-                        <div class="col-4">
+                    <div class="row mb-3 g-2">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">Region</label>
                             <input type="text" name="region" class="form-control" value="{{ request('region') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">Province</label>
                             <input type="text" name="province" class="form-control" value="{{ request('province') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">City</label>
                             <input type="text" name="city" class="form-control" value="{{ request('city') }}">
                         </div>
                     </div>
 
                     {{-- Edizioni --}}
-                    <div class="row mb-3">
-                        <div class="col-4">
+                    <div class="row mb-3 g-2">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">Corpus</label>
                             <input type="text" name="corpus" class="form-control" value="{{ request('corpus') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">Volume</label>
                             <input type="text" name="volume" class="form-control" value="{{ request('volume') }}">
                         </div>
-                        <div class="col-4">
+                        <div class="col-12 col-md-4">
                             <label class="form-label">Inscription number</label>
                             <input type="number" name="number_inscription" class="form-control"
                                 value="{{ request('number_inscription') }}">
@@ -113,8 +121,8 @@
                     </div>
 
                     {{-- Religione --}}
-                    <div class="row mb-4">
-                        <div class="col-6">
+                    <div class="row mb-4 g-2">
+                        <div class="col-12 col-md-6">
                             <label class="form-label">Religion</label>
                             <select name="religion" class="form-select">
                                 <option value="">All</option>
@@ -123,7 +131,7 @@
                                 <option value="christian" @selected(request('religion') === 'christian')>Christian</option>
                             </select>
                         </div>
-                        <div class="col-6 form-check align-items-center mt-4 ps-5">
+                        <div class="col-12 col-md-6 form-check align-items-center mt-md-4 ps-md-5">
                             <input type="checkbox" name="is_sacred_dedication" class="form-check-input"
                                 id="is_sacred_dedication" @checked(request('is_sacred_dedication'))>
                             <label class="form-check-label" for="is_sacred_dedication">Sacred dedication</label>
@@ -173,7 +181,7 @@
                     {{-- People --}}
                     <div class="mb-3">
                         <h5>People</h5>
-                        <div id="people-container" data-people='@json(request('people', []))'>
+                        <div id="people-container" data-people='@json(array_values(request('people', [])))'>
                         </div>
                         <button type="button" class="btn btn-outline-secondary btn-sm" id="add-person-btn">+ Add person</button>
                     </div>
@@ -195,7 +203,8 @@
 
             foreach (array_values(request('search', [])) as $i => $row) {
                 if (empty($row['term'])) continue;
-                $label = $i > 0 ? ($row['operator'] ?? 'AND') . ' ' : '';
+                $op = $row['operator'] ?? 'AND';
+                $label = ($i > 0 || $op === 'NOT') ? $op . ' ' : '';
                 $label .= '"' . $row['term'] . '"';
                 if (!empty($row['exact'])) $label .= ' · exact';
                 if (!empty($row['within'])) $label .= ' · within ' . $row['within'] . ' chars';
@@ -256,9 +265,11 @@
 
         <div class="row">
             {{ $filings->appends(request()->query())->links('pagination::bootstrap-5') }}
+            <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
+                        <th scope="col" class="border-end">#</th>
                         <th scope="col">Id</th>
                         <th scope="col">Bibliography</th>
                         <th scope="col">Origin</th>
@@ -270,7 +281,9 @@
                 <tbody>
                     @foreach ($filings as $filing)
                         <tr>
-                            <th scope="row">{{ $filing->id }}</th>
+                            <th scope="row" class="border-end">{{ $filings->firstItem() + $loop->index }}</th>
+
+                            <td>{{ $filing->id }}</td>
 
                             <td>
                                 <ul>
@@ -323,6 +336,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
             {{ $filings->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
     </div>

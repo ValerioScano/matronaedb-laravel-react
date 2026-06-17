@@ -18,15 +18,15 @@
 @section('content')
     <div class="container">
         <div class="row">
-            <div class="{{$filing ? 'col-6' : 'col-12' }}">
+            <div class="col-12 {{ $filing ? 'col-lg-6' : '' }}">
                 <div class="row align-items-center">
-                    <div class="col-2">
+                    <div class="col-auto">
                         @if ($previousId)
                             <a href="{{ route('proposals.show', $previousId) }}" class="btn btn-outline-primary">←
                                 Previous</a>
                         @endif
                     </div>
-                    <div class="col-8 text-center p-5">
+                    <div class="col text-center p-3 p-md-5">
                         <h1>
                             <h1>
                                 @if ($proposal->trashed())
@@ -53,7 +53,7 @@
                             </span>
                         </h1>
                     </div>
-                    <div class="col-2">
+                    <div class="col-auto">
                         @if ($nextId)
                             <a href="{{ route('proposals.show', $nextId) }}" class="btn btn-outline-primary">Next →</a>
                         @endif
@@ -74,7 +74,7 @@
 
                 <div class="row mb-4 g-4">
 
-                    <div class="col-4 d-flex flex-column gap-3">
+                    <div class="col-12 col-md-4 d-flex flex-column gap-3">
 
                         <div class="p-3 border rounded-3">
                             <h5 class="mb-3">Tags</h5>
@@ -96,11 +96,23 @@
                                 <div class="mb-2">
                                     <span>{{ implode(' ', array_filter([$person->praenomen, $person->nomen, $person->cognomen])) }}</span>
                                     @if ($person->TM_PER_id)
-                                        <span class="text-muted small ms-1">(TM {{ $person->TM_PER_id }})</span>
+                                        <span class="text-muted small ms-1">(TM Per ID{{ $person->TM_PER_id }})</span>
                                     @endif
                                 </div>
                             @empty
                                 <span class="text-muted">No people recorded</span>
+                            @endforelse
+                        </div>
+
+                        <div class="p-3 border rounded-3">
+                            <h5 class="mb-3">External resources</h5>
+                            @forelse($proposal->externalResources as $resource)
+                                <a href="{{ $resource->link }}" target="_blank" rel="noopener noreferrer"
+                                    class="btn btn-outline-secondary btn-sm me-1 mb-2">
+                                    {{ $resource->name ?? $resource->link }}
+                                </a>
+                            @empty
+                                <span class="text-muted">No external resources</span>
                             @endforelse
                         </div>
 
@@ -156,7 +168,7 @@
 
                     </div>
 
-                    <div class="col-8">
+                    <div class="col-12 col-md-8">
                         <div class="p-3 border rounded-3 mb-5 h-100">
                             <h4 class="mb-3 text-center">Text</h4>
                             <p class="mb-0">{{ $proposal->text }}</p>
@@ -248,7 +260,7 @@
             {{-- Fine proposal / Inizio filing originale per confronto con proposal (admin function) --}}
 
             @if ($filing)
-                <div class="col-6 border border-start">
+                <div class="col-12 col-lg-6 border-top border-lg-start mt-4 mt-lg-0">
                     <div class="row align-items-center">
                         <div class="col-12 text-center p-5">
                             <h1>Filing #{{ $filing->id }}</h1>
@@ -257,7 +269,7 @@
 
                     <div class="row mb-4 g-4 mt-5">
 
-                        <div class="col-4 d-flex flex-column gap-3">
+                        <div class="col-12 col-md-4 d-flex flex-column gap-3">
 
                             <div class="p-3 border rounded-3">
                                 <h5 class="mb-3">Tags</h5>
@@ -284,6 +296,18 @@
                                     </div>
                                 @empty
                                     <span class="text-muted">No people recorded</span>
+                                @endforelse
+                            </div>
+
+                            <div class="p-3 border rounded-3">
+                                <h5 class="mb-3">External resources</h5>
+                                @forelse($filing->externalResources as $resource)
+                                    <a href="{{ $resource->link }}" target="_blank" rel="noopener noreferrer"
+                                        class="btn btn-outline-secondary btn-sm me-1 mb-2">
+                                        {{ $resource->name ?? $resource->link }}
+                                    </a>
+                                @empty
+                                    <span class="text-muted">No external resources</span>
                                 @endforelse
                             </div>
 
@@ -337,7 +361,7 @@
 
                         </div>
 
-                        <div class="col-8">
+                        <div class="col-12 col-md-8">
                             <div class="p-3 border rounded-3 h-100">
                                 <h5 class="mb-3">Text</h5>
                                 <p class="mb-0">{{ $filing->text }}</p>

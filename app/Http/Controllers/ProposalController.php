@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Edition;
+use App\Models\ExternalResource;
 use App\Models\Filing;
 use App\Models\Proposal;
 use App\Models\Tag;
@@ -28,7 +29,7 @@ class ProposalController extends Controller
         $proposal = Proposal::withTrashed()->findOrFail($id);
         $proposal->load(['editions' => function ($query) {
             $query->withTrashed();
-        }, 'people']);
+        }, 'people', 'externalResources']);
         $groupedTags = $proposal->tags->groupBy('category');
         $filing = null;
         $groupedTagsFiling = null;
@@ -37,7 +38,7 @@ class ProposalController extends Controller
         $user = Auth::user();
 
         if ($proposal->filing_id && $proposal->status === 'pending' && $user?->isAdmin()) {
-            $filing = Filing::withTrashed()->with(['editions', 'tags', 'people'])->find($proposal->filing_id);
+            $filing = Filing::withTrashed()->with(['editions', 'tags', 'people', 'externalResources'])->find($proposal->filing_id);
             $groupedTagsFiling = $filing->tags->groupBy('category');
         }
 
@@ -133,7 +134,17 @@ class ProposalController extends Controller
             }
         }
 
-        // 4. Salva i tags
+        // 4. Salva le risorse esterne
+        if (array_key_exists('external_resources', $data)) {
+            foreach ($data['external_resources'] as $resourceData) {
+                $proposal->externalResources()->create([
+                    'name' => $resourceData['name'] ?? null,
+                    'link' => $resourceData['link'] ?? null,
+                ]);
+            }
+        }
+
+        // 5. Salva i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         }
@@ -146,7 +157,7 @@ class ProposalController extends Controller
      */
     public function edit(Proposal $proposal)
     {
-        $proposal->load(['editions', 'people']);
+        $proposal->load(['editions', 'people', 'externalResources']);
         $pairedTags = $this->buildTagPairs(Tag::all());
 
         return view('pages.proposals.edit', compact('proposal', 'pairedTags'));
@@ -230,7 +241,18 @@ class ProposalController extends Controller
             }
         }
 
-        // 4. Aggiorna i tags
+        // 4. Aggiorna le risorse esterne
+        $proposal->externalResources()->delete();
+        if (array_key_exists('external_resources', $data)) {
+            foreach ($data['external_resources'] as $resourceData) {
+                $proposal->externalResources()->create([
+                    'name' => $resourceData['name'] ?? null,
+                    'link' => $resourceData['link'] ?? null,
+                ]);
+            }
+        }
+
+        // 5. Aggiorna i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         } else {
@@ -256,6 +278,7 @@ class ProposalController extends Controller
 
         $proposal->editions()->delete();
         $proposal->people()->delete();
+        $proposal->externalResources()->delete();
         $proposal->tags()->detach();
         $proposal->delete();
 
@@ -264,7 +287,7 @@ class ProposalController extends Controller
 
     public function createRevision(Filing $filing)
     {
-        $filing->load(['editions', 'people']);
+        $filing->load(['editions', 'people', 'externalResources']);
         $pairedTags = $this->buildTagPairs(Tag::all());
 
         return view('pages.proposals.create_revision', compact('filing', 'pairedTags'));
@@ -334,7 +357,17 @@ class ProposalController extends Controller
             }
         }
 
-        // 4. Salva i tags
+        // 4. Salva le risorse esterne
+        if (array_key_exists('external_resources', $data)) {
+            foreach ($data['external_resources'] as $resourceData) {
+                $proposal->externalResources()->create([
+                    'name' => $resourceData['name'] ?? null,
+                    'link' => $resourceData['link'] ?? null,
+                ]);
+            }
+        }
+
+        // 5. Salva i tags
         if (array_key_exists('tags', $data)) {
             $proposal->tags()->sync($data['tags']);
         }
@@ -409,6 +442,15 @@ class ProposalController extends Controller
                 'nomen'     => $person->nomen,
                 'cognomen'  => $person->cognomen,
                 'TM_PER_id' => $person->TM_PER_id,
+            ]);
+        }
+
+        // 4b. Copia le risorse esterne
+        $filing->externalResources()->delete();
+        foreach ($proposal->externalResources as $resource) {
+            $filing->externalResources()->create([
+                'name' => $resource->name,
+                'link' => $resource->link,
             ]);
         }
 

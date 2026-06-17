@@ -4,6 +4,7 @@ use App\Http\Controllers\FilingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PublicPageController;
+use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +48,16 @@ Route::prefix('proposals')->name('proposals.')->middleware(['auth', 'verified'])
     // Revisions
     Route::get('/filings/{filing}/create', [ProposalController::class, 'createRevision'])->name('revisions.create');
     Route::post('/filings/{filing}', [ProposalController::class, 'storeRevision'])->name('revisions.store');
+});
+
+// Tags
+Route::prefix('tags')->name('tags.')->middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::get('/', [TagController::class, 'index'])->name('index');
+    Route::get('/create', [TagController::class, 'create'])->name('create');
+    Route::post('/', [TagController::class, 'store'])->name('store');
+    Route::get('/{tag}/edit', [TagController::class, 'edit'])->name('edit');
+    Route::put('/{tag}', [TagController::class, 'update'])->name('update');
+    Route::delete('/{tag}', [TagController::class, 'destroy'])->name('destroy');
 });
 
 // Users

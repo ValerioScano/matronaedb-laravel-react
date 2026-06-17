@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\ExternalResource;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasBibliography;
 use App\Traits\HasOrigin;
@@ -47,5 +48,10 @@ class Proposal extends Model
     public function people():MorphMany
     {
         return $this->morphMany(Person::class, 'peopleable');
+    }
+
+    public function externalResources():MorphMany
+    {
+        return $this->morphMany(ExternalResource::class, 'external_resourceable');
     }
 }
