@@ -6,10 +6,18 @@ use App\Http\Controllers\ProposalController;
 use App\Http\Controllers\PublicPageController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\UserController;
+use App\Models\Filing;
+use App\Models\Person;
 use Illuminate\Support\Facades\Route;
 
 // Welcome
-Route::view('/', 'pages.welcome')->name('welcome');
+Route::get('/', function () {
+    return view('pages.welcome', [
+        'filingsCount' => Filing::count(),
+        'provincesCount' => Filing::distinct()->count('province'),
+        'peopleCount' => Person::count(),
+    ]);
+})->name('welcome');
 
 Route::view('/esercizio', 'pages.esercizio');
 

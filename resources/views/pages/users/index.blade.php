@@ -2,7 +2,6 @@
 
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Users' list</h1>
@@ -110,5 +109,4 @@
             </div>
             {{ $users->links('pagination::bootstrap-5') }}
         </div>
-    </div>
 @endsection

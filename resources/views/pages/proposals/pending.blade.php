@@ -2,7 +2,6 @@
 
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Pending proposals</h1>
@@ -38,8 +37,7 @@
                             <td>{{ $user_proposal->location }}</td>
                             <td>{{ $user_proposal->textTruncate() }}</td>
                             <td>{{ $user_proposal->datation }}</td>
-                            <td><a href="{{ route('proposals.show', $user_proposal->id) }}" class="btn btn-primary">See
-                                    details</a></td>
+                            <td><a href="{{ route('proposals.show', $user_proposal->id) }}" class="btn btn-primary btn-sm">Details</a></td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -47,5 +45,4 @@
             </div>
             {{ $user_proposals->links('pagination::bootstrap-5') }}
         </div>
-    </div>
 @endsection

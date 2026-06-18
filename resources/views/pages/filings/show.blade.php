@@ -17,7 +17,6 @@
 @endsection
 
 @section('content')
-    <div class="container">
         <div class="row align-items-center">
             <div class="col-auto">
                 @if ($previousId)
@@ -161,21 +160,23 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">Confirm deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
-                    <div class="modal-body">
-                        Are you sure you want to delete this filing?
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <form action="{{ route('filings.destroy', $filing) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
+                    <form action="{{ route('filings.destroy', $filing) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <div class="modal-body">
+                            <p>Why do you want to delete this filing?</p>
+                            <label for="deletion_notes" class="form-label">Reasons:</label>
+                            <textarea name="deletion_notes" id="deletion_notes" class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                             <input type="submit" class="btn btn-danger" value="Delete">
-                        </form>
-                    </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
 
-    </div>
 @endsection

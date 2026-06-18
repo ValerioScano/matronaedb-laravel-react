@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Browse the database</h1>
@@ -295,7 +294,7 @@
 
                             <td>{{ $filing->location }}</td>
                             <td>{{ $filing->textTruncate() }}</td>
-                            <td>{{ $filing->datation }}</td>
+                            <td class="text-nowrap">{{ $filing->datation }}</td>
                             <td>
                                 <div class="d-flex gap-2">
                                     <a class="btn btn-outline-primary btn-sm"
@@ -311,25 +310,27 @@
                         </tr>
 
 
-                        {{-- Logica modale cancellazione filing --}}
-
+                        {{-- Modale cancellazione filing --}}
                         <div class="modal fade" id="deleteModal-{{ $filing->id }}">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
                                         <h5 class="modal-title">Confirm deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                     </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete this filing?
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <form action="{{ route('filings.destroy', $filing) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
+                                    <form action="{{ route('filings.destroy', $filing) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <div class="modal-body">
+                                            <p>Why do you want to delete this filing?</p>
+                                            <label for="deletion_notes_{{ $filing->id }}" class="form-label">Reasons:</label>
+                                            <textarea name="deletion_notes" id="deletion_notes_{{ $filing->id }}" class="form-control" rows="4"></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                             <input type="submit" class="btn btn-danger" value="Delete">
-                                        </form>
-                                    </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -339,5 +340,4 @@
             </div>
             {{ $filings->appends(request()->query())->links('pagination::bootstrap-5') }}
         </div>
-    </div>
 @endsection

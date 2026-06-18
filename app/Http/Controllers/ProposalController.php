@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ApprovedProposal;
+use App\Mail\RejectedProposal;
 use App\Models\Edition;
 use App\Models\ExternalResource;
 use App\Models\Filing;
@@ -11,6 +13,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class ProposalController extends Controller
 {
@@ -262,7 +265,7 @@ class ProposalController extends Controller
         /** @var User $user */
         $user = Auth::user();
         if ($request->approve_after_edit && $user->isAdmin()) {
-            return $this->approve($proposal);
+            return $this->approve($proposal, $request);
         }
 
         return redirect()->route('proposals.show', $proposal);
@@ -388,7 +391,7 @@ class ProposalController extends Controller
     /**
      * Approve the filing.
      */
-    public function approve(Proposal $proposal)
+    public function approve(Proposal $proposal, Request $request)
     {
         if ($proposal->status !== 'pending') {
             return redirect()->route('proposals.pending')
@@ -463,6 +466,7 @@ class ProposalController extends Controller
         $proposal->filing_id = $filing->id;
         $proposal->save();
 
+        Mail::to($proposal->proposedBy)->send(new ApprovedProposal($proposal));
         return redirect()->route('proposals.pending');
     }
 
@@ -476,6 +480,7 @@ class ProposalController extends Controller
         $proposal->approved_by = Auth::id();
         $proposal->save();
 
+        Mail::to($proposal->proposedBy)->send(new RejectedProposal($proposal));
         return redirect()->route('proposals.pending');
     }
 }

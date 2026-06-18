@@ -15,7 +15,7 @@ trait HasBibliography {
                 $result .= $edition->publication_year ? ' (' . $edition->publication_year . '), ' : '';
                 $result .= $edition->corpus;
                 $result .= $edition->volume ? $edition->volume : '';
-                $result .= $edition->corpus_page ? ', p. ' . $edition->corpus_page . ', ': '';
+                $result .= $edition->corpus_page ? ', p. ' . $edition->corpus_page : '';
                 $result .= $edition->number_inscription ? ', n. ' . $edition->number_inscription : '';
             } 
             if ($edition->edition_type === 'corpus') {

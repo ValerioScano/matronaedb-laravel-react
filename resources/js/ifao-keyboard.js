@@ -2,13 +2,13 @@
     {
         group: 'Diacritics',
         keys: [
-            { char: '̣', label: '◌̣', title: 'Dot below (punto sotto)' },
-            { char: '̲', label: '◌̲', title: 'Low line below (trattino sotto)' },
-            { char: '̅', label: '◌̅', title: 'Overline (trattino sopra)' },
-            { char: 'ˆ', label: '◌ˆ', title: 'Circumflex above (cappuccetto)' },
-            { char: '', label: '◌', title: 'Acute accent (accento acuto)' },
-            { char: '', label: '◌', title: 'Grave accent (accento grave)' },
-            { char: '', label: '◌', title: 'Circumflex accent (accento circonflesso)' },
+            { char: '̣', label: 'ạ', title: 'Dot below' },
+            { char: '̲', label: 'a̲', title: 'Low line below' },
+            { char: '̅', label: 'a̅', title: 'Overline' },
+            { char: '̂', label: 'â', title: 'Caret'},
+            { char: '', label: 'a', title: 'Acute accent' },
+            { char: '', label: 'a', title: 'Grave accent' },
+            { char: '', label: 'a', title: 'Circumflex accent' },
         ],
     },
     {

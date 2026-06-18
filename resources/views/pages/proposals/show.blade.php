@@ -16,7 +16,6 @@
     </script>
 @endsection
 @section('content')
-    <div class="container">
         <div class="row">
             <div class="col-12 {{ $filing ? 'col-lg-6' : '' }}">
                 <div class="row align-items-center">
@@ -373,5 +372,4 @@
             @endif
 
         </div>
-    </div>
 @endsection

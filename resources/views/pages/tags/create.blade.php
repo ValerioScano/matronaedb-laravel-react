@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Create tag pair</h1>
@@ -76,5 +75,4 @@
                 </div>
             </div>
         </div>
-    </div>
 @endsection

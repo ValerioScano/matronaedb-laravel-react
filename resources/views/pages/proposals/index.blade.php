@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Your proposals</h1>
@@ -52,5 +51,4 @@
             </div>
             {{ $user_proposals->links('pagination::bootstrap-5') }}
         </div>
-    </div>
 @endsection

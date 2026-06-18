@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\CanceledFiling;
 use App\Models\Filing;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class FilingController extends Controller
 {
@@ -122,8 +124,11 @@ class FilingController extends Controller
         return view('pages.filings.show', compact('filing', 'groupedTags', 'previousId', 'nextId'));
     }
 
-    public function destroy(Filing $filing)
+    public function destroy(Filing $filing, Request $request)
     {
+        $filing->deletion_notes = $request->deletion_notes;
+        $filing->save();
+
         foreach ($filing->editions as $edition) {
             if ($edition->edition_image) {
                 Storage::delete($edition->edition_image);
@@ -134,12 +139,13 @@ class FilingController extends Controller
             $proposal->delete();
         }
 
+        Mail::to($filing->proposedBy)->send(new CanceledFiling($filing));
+
         $filing->editions()->delete();
         $filing->people()->delete();
         $filing->externalResources()->delete();
         $filing->tags()->detach();
         $filing->delete();
-
         return redirect()->route('filings.index');
     }
 }

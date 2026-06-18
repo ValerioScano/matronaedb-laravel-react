@@ -1,8 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.operational')
 
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Add a new filing</h1>
@@ -181,5 +180,4 @@
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </form>
-    </div>
 @endsection

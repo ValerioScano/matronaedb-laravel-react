@@ -1,8 +1,7 @@
-@extends('layouts.app')
+@extends('layouts.operational')
 
 
 @section('content')
-    <div class="container">
         <div class="row text-center flex-column py-5">
             <div class="col-12">
                 <h1>Add a new filing</h1>
@@ -18,8 +17,6 @@
             </div>
         @endif
 
-
-        <div class="container">
             <form action="{{ route('proposals.update', $proposal) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -202,7 +199,5 @@
                     <input type="hidden" name="approve_after_edit" value="1">
                 @endif
             </form>
-        </div>
 
-    </div>
 @endsection
