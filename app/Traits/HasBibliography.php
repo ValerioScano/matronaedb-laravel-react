@@ -25,8 +25,14 @@ trait HasBibliography {
                 }
 
             if ($edition->edition_type === 'book') {
-                $result = $edition->corpus;
-                // AGGIORNA I campi del libro
+                $segments = array_filter([
+                    $edition->last_name_author,
+                    $edition->corpus,
+                    trim($edition->publication_place . ' ' . $edition->publication_year) ?: null,
+                    $edition->corpus_page ? 'p. ' . $edition->corpus_page : null,
+                    $edition->number_inscription ? 'nr. ' . $edition->number_inscription : null,
+                ], fn ($segment) => filled($segment));
+                $result = implode(', ', $segments);
             }
 
             return [

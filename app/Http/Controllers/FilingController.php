@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\FilingsExport;
 use App\Mail\CanceledFiling;
 use App\Models\Filing;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Maatwebsite\Excel\Facades\Excel;
 
 class FilingController extends Controller
 {
@@ -20,15 +22,12 @@ class FilingController extends Controller
         return preg_replace('/\s+/', ' ', trim($text));
     }
 
-    public function index(Request $request)
+    private function filteredFilingsQuery(Request $request)
     {
-        $tags = Tag::all();
-        $pairedTags = $this->buildTagPairs($tags);
-
-        $filings = Filing::with(['editions', 'tags'])
+        return Filing::with(['editions', 'tags'])
             ->when($request->filled('id'), fn ($q) => $q->where('id', $request->input('id')))
-            ->when($request->filled('region'), fn ($q) => $q->where('region', 'LIKE', '%'.$request->input('region').'%'))
-            ->when($request->filled('province'), fn ($q) => $q->where('province', 'LIKE', '%'.$request->input('province').'%'))
+            ->when($request->filled('macroarea'), fn ($q) => $q->whereIn('macroarea', (array) $request->input('macroarea')))
+            ->when($request->filled('province'), fn ($q) => $q->whereIn('province', (array) $request->input('province')))
             ->when($request->filled('city'), fn ($q) => $q->where('city', 'LIKE', '%'.$request->input('city').'%'))
             ->when($request->filled('min_year'), fn ($q) => $q->where('min_year', '>=', $request->input('min_year')))
             ->when($request->filled('max_year'), fn ($q) => $q->where('max_year', '<=', $request->input('max_year')))
@@ -102,11 +101,25 @@ class FilingController extends Controller
                         }
                     }
                 });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            });
+    }
+
+    public function index(Request $request)
+    {
+        $tags = Tag::all();
+        $pairedTags = $this->buildTagPairs($tags);
+
+        $filings = $this->filteredFilingsQuery($request)->paginate(100);
 
         return view('pages.filings.index', compact('filings', 'pairedTags', 'tags'));
+    }
+
+    public function export(Request $request)
+    {
+        return Excel::download(
+            new FilingsExport($this->filteredFilingsQuery($request)),
+            'filings.xlsx'
+        );
     }
 
     public function show(Filing $filing)

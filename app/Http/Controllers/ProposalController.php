@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\Macroarea;
+use App\Enums\Province;
 use App\Mail\ApprovedProposal;
 use App\Mail\RejectedProposal;
 use App\Models\Edition;
@@ -14,9 +16,36 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 class ProposalController extends Controller
 {
+    /**
+     * Resolve the edition_image value for an edition payload: stores a newly
+     * uploaded file, clears it when the removal flag is set, or otherwise
+     * keeps whatever the existing edition already had.
+     */
+    private function resolveEditionImage(array $edition, ?Edition $existingEdition = null): ?string
+    {
+        if (array_key_exists('edition_image', $edition)) {
+            if ($existingEdition?->edition_image) {
+                Storage::delete($existingEdition->edition_image);
+            }
+
+            return Storage::putFile('editions', $edition['edition_image']);
+        }
+
+        if (! empty($edition['remove_edition_image'])) {
+            if ($existingEdition?->edition_image) {
+                Storage::delete($existingEdition->edition_image);
+            }
+
+            return null;
+        }
+
+        return $existingEdition?->edition_image;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -79,18 +108,21 @@ class ProposalController extends Controller
     {
         $request->validate([
             'text' => 'required',
-            'region' => 'required',
-            'province' => 'required',
+            'macroarea' => ['required', Rule::in(Macroarea::values())],
+            'province' => ['required', Rule::in(Province::values())],
             'editions.*.edition_type' => 'required_with:editions',
 
             'religion' => 'required|in:uncertain,pagan,christian',
             'editions.*.corpus' => 'required_with:editions',
+        ], [], [
+            'editions.*.edition_type' => 'edition type',
+            'editions.*.corpus' => 'corpus',
         ]);
         $data = $request->all();
 
         $proposal = new Proposal;
         $proposal->text = $data['text'];
-        $proposal->region = $data['region'];
+        $proposal->macroarea = $data['macroarea'];
         $proposal->province = $data['province'];
         $proposal->city = $data['city'] ?? null;
         $proposal->min_year = $data['min_year'] ?? null;
@@ -114,12 +146,11 @@ class ProposalController extends Controller
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'publication_place' => $edition['publication_place'] ?? null,
                     'link' => $edition['link'] ?? null,
                 ];
 
-                if (array_key_exists('edition_image', $edition)) {
-                    $editionData['edition_image'] = Storage::putFile('editions', $edition['edition_image']);
-                }
+                $editionData['edition_image'] = $this->resolveEditionImage($edition);
 
                 $proposal->editions()->create($editionData);
             }
@@ -173,18 +204,21 @@ class ProposalController extends Controller
     {
         $request->validate([
             'text' => 'required',
-            'region' => 'required',
-            'province' => 'required',
+            'macroarea' => ['required', Rule::in(Macroarea::values())],
+            'province' => ['required', Rule::in(Province::values())],
             'editions.*.edition_type' => 'required_with:editions',
 
             'religion' => 'required|in:uncertain,pagan,christian',
             'editions.*.corpus' => 'required_with:editions',
+        ], [], [
+            'editions.*.edition_type' => 'edition type',
+            'editions.*.corpus' => 'corpus',
         ]);
         $data = $request->all();
 
         // 1. Aggiorna la proposal
         $proposal->text = $data['text'];
-        $proposal->region = $data['region'];
+        $proposal->macroarea = $data['macroarea'];
         $proposal->province = $data['province'];
         $proposal->city = $data['city'] ?? null;
         $proposal->min_year = $data['min_year'] ?? null;
@@ -209,22 +243,16 @@ class ProposalController extends Controller
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'publication_place' => $edition['publication_place'] ?? null,
                     'link' => $edition['link'] ?? null,
                 ];
 
-                if (array_key_exists('edition_image', $edition)) {
-                    if (isset($edition['id'])) {
-                        $oldEdition = Edition::find($edition['id']);
-                        if ($oldEdition->edition_image) {
-                            Storage::delete($oldEdition->edition_image);
-                        }
-                    }
-                    $editionData['edition_image'] = Storage::putFile('editions', $edition['edition_image']);
-                }
+                $existingEdition = isset($edition['id']) ? Edition::find($edition['id']) : null;
+                $editionData['edition_image'] = $this->resolveEditionImage($edition, $existingEdition);
 
-                if (isset($edition['id'])) {
+                if ($existingEdition) {
                     // Aggiorna edizione esistente
-                    Edition::find($edition['id'])->update($editionData);
+                    $existingEdition->update($editionData);
                 } else {
                     // Crea nuova edizione collegata alla proposal
                     $proposal->editions()->create($editionData);
@@ -300,12 +328,15 @@ class ProposalController extends Controller
     {
         $request->validate([
             'text' => 'required',
-            'region' => 'required',
-            'province' => 'required',
+            'macroarea' => ['required', Rule::in(Macroarea::values())],
+            'province' => ['required', Rule::in(Province::values())],
             'editions.*.edition_type' => 'required_with:editions',
 
             'religion' => 'required|in:uncertain,pagan,christian',
             'editions.*.corpus' => 'required_with:editions',
+        ], [], [
+            'editions.*.edition_type' => 'edition type',
+            'editions.*.corpus' => 'corpus',
         ]);
         $data = $request->all();
 
@@ -314,7 +345,7 @@ class ProposalController extends Controller
         $proposal->filing_id = $filing->id;
         $proposal->proposed_by = Auth::id();
         $proposal->text = $data['text'];
-        $proposal->region = $data['region'];
+        $proposal->macroarea = $data['macroarea'];
         $proposal->province = $data['province'];
         $proposal->city = $data['city'] ?? null;
         $proposal->min_year = $data['min_year'] ?? null;
@@ -337,12 +368,11 @@ class ProposalController extends Controller
                     'publication_year' => $edition['publication_year'] ?? null,
                     'corpus_page' => $edition['corpus_page'] ?? null,
                     'last_name_author' => $edition['last_name_author'] ?? null,
+                    'publication_place' => $edition['publication_place'] ?? null,
                     'link' => $edition['link'] ?? null,
                 ];
 
-                if (array_key_exists('edition_image', $edition)) {
-                    $editionData['edition_image'] = Storage::putFile('editions', $edition['edition_image']);
-                }
+                $editionData['edition_image'] = $this->resolveEditionImage($edition);
 
                 $proposal->editions()->create($editionData);
             }
@@ -408,7 +438,7 @@ class ProposalController extends Controller
 
         // 2. Copia i campi dalla proposal al filing
         $filing->text = $proposal->text;
-        $filing->region = $proposal->region;
+        $filing->macroarea = $proposal->macroarea;
         $filing->province = $proposal->province;
         $filing->city = $proposal->city;
         $filing->min_year = $proposal->min_year;
@@ -432,6 +462,7 @@ class ProposalController extends Controller
                 'publication_year' => $edition->publication_year,
                 'corpus_page' => $edition->corpus_page,
                 'last_name_author' => $edition->last_name_author,
+                'publication_place' => $edition->publication_place,
                 'edition_image' => $edition->edition_image,
                 'link' => $edition['link'] ?? null,
             ]);

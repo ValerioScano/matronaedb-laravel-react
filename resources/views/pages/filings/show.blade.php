@@ -24,7 +24,7 @@
                 @endif
             </div>
             <div class="col text-center p-3 p-md-5">
-                <h1>Filing #{{ $filing->id }} @if ($filing->trashed())
+                <h1>MATR {{ $filing->id }} @if ($filing->trashed())
                         <span class="badge bg-danger">Deleted</span>
                     @endif
                 </h1>
@@ -46,7 +46,7 @@
                         <div class="mb-1">
                             <strong>{{ ucfirst($category) }}:</strong>
                             @foreach ($tags as $tag)
-                                <span class="badge bg-primary">{{ $tag->label }}</span>
+                                <span class="badge" style="{{ $tag->badgeStyle() }}">{{ $tag->label }}</span>
                             @endforeach
                         </div>
                     @empty

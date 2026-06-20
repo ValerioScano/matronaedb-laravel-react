@@ -8,10 +8,15 @@
                         with admin privileges
                     @endif
                 </p>
-                <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas"
-                    data-bs-target="#filterOffcanvas">
-                    <i class="bi bi-funnel"></i> Filters
-                </button>
+                <div class="d-flex justify-content-center gap-2">
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas"
+                        data-bs-target="#filterOffcanvas">
+                        <i class="bi bi-funnel"></i> Filters
+                    </button>
+                    <a class="btn btn-outline-success" href="{{ route('filings.export', request()->query()) }}">
+                        <i class="bi bi-file-earmark-excel"></i> Export to Excel
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -47,7 +52,7 @@
                                             placeholder="Search string..." value="{{ $row['term'] ?? '' }}">
                                     </div>
                                     <div class="col-12 col-md-3">
-                                        <input type="number" name="search[{{ $i }}][within]" class="form-control"
+                                        <input type="number" name="search[{{ $i }}][within]" class="form-control" min="0"
                                             placeholder="Within n chars from start" value="{{ $row['within'] ?? '' }}">
                                     </div>
                                     <div class="col-5 col-md-auto form-check form-switch mb-0">
@@ -69,15 +74,15 @@
                     <div class="row mb-4 align-items-center g-2">
                         <div class="col-12 col-sm-2">
                             <label class="form-label">Filing ID</label>
-                            <input type="number" name="id" class="form-control" value="{{ request('id') }}">
+                            <input type="number" name="id" class="form-control" min="0" value="{{ request('id') }}">
                         </div>
                         <div class="col-12 col-sm-4">
                             <label class="form-label">From year</label>
-                            <input type="number" name="min_year" class="form-control" value="{{ request('min_year') }}">
+                            <input type="number" name="min_year" class="form-control" min="-750" max="1800" value="{{ request('min_year') }}">
                         </div>
                         <div class="col-12 col-sm-4">
                             <label class="form-label">To year</label>
-                            <input type="number" name="max_year" class="form-control" value="{{ request('max_year') }}">
+                            <input type="number" name="max_year" class="form-control" min="-750" max="1800" value="{{ request('max_year') }}">
                         </div>
                         <div class="col-12 col-sm-2 form-check mt-sm-4 ms-sm-2">
                             <input type="checkbox" name="is_certain_date" class="form-check-input" id="is_certain_date"
@@ -88,13 +93,29 @@
 
                     {{-- Localizzazione --}}
                     <div class="row mb-3 g-2">
-                        <div class="col-12 col-md-4">
-                            <label class="form-label">Region</label>
-                            <input type="text" name="region" class="form-control" value="{{ request('region') }}">
+                        <div class="col-12 col-md-6">
+                            <h5>Macroarea</h5>
+                            <div class="row g-1" style="max-height: 200px; overflow-y: auto;">
+                                @foreach (\App\Enums\Macroarea::cases() as $macroarea)
+                                    <div class="col-12 col-sm-6 form-check">
+                                        <input type="checkbox" class="form-check-input" id="macroarea_{{ $loop->index }}"
+                                            name="macroarea[]" value="{{ $macroarea->value }}" @checked(in_array($macroarea->value, request('macroarea', [])))>
+                                        <label class="form-check-label" for="macroarea_{{ $loop->index }}">{{ $macroarea->value }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <label class="form-label">Province</label>
-                            <input type="text" name="province" class="form-control" value="{{ request('province') }}">
+                        <div class="col-12 col-md-6">
+                            <h5>Province</h5>
+                            <div class="row g-1" style="max-height: 200px; overflow-y: auto;">
+                                @foreach (\App\Enums\Province::cases() as $province)
+                                    <div class="col-12 col-sm-6 form-check">
+                                        <input type="checkbox" class="form-check-input" id="province_{{ $loop->index }}"
+                                            name="province[]" value="{{ $province->value }}" @checked(in_array($province->value, request('province', [])))>
+                                        <label class="form-check-label" for="province_{{ $loop->index }}">{{ $province->value }}</label>
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label">City</label>
@@ -105,7 +126,7 @@
                     {{-- Edizioni --}}
                     <div class="row mb-3 g-2">
                         <div class="col-12 col-md-4">
-                            <label class="form-label">Corpus</label>
+                            <label class="form-label">Corpus / Book title</label>
                             <input type="text" name="corpus" class="form-control" value="{{ request('corpus') }}">
                         </div>
                         <div class="col-12 col-md-4">
@@ -114,7 +135,7 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <label class="form-label">Inscription number</label>
-                            <input type="number" name="number_inscription" class="form-control"
+                            <input type="number" name="number_inscription" class="form-control" min="0"
                                 value="{{ request('number_inscription') }}">
                         </div>
                     </div>
@@ -214,8 +235,6 @@
                 'id'                  => ['prefix' => 'ID: ',            'color' => 'secondary'],
                 'min_year'            => ['prefix' => 'From year: ',     'color' => 'secondary'],
                 'max_year'            => ['prefix' => 'To year: ',       'color' => 'secondary'],
-                'region'              => ['prefix' => 'Region: ',        'color' => 'secondary'],
-                'province'            => ['prefix' => 'Province: ',      'color' => 'secondary'],
                 'city'                => ['prefix' => 'City: ',          'color' => 'secondary'],
                 'corpus'              => ['prefix' => 'Corpus: ',        'color' => 'secondary'],
                 'volume'              => ['prefix' => 'Volume: ',        'color' => 'secondary'],
@@ -230,6 +249,14 @@
 
             if (request('is_certain_date'))    $badges[] = ['text' => 'Certain date',      'color' => 'secondary'];
             if (request('is_sacred_dedication')) $badges[] = ['text' => 'Sacred dedication', 'color' => 'secondary'];
+
+            foreach (request('macroarea', []) as $value) {
+                $badges[] = ['text' => 'Macroarea: ' . $value, 'color' => 'secondary'];
+            }
+
+            foreach (request('province', []) as $value) {
+                $badges[] = ['text' => 'Province: ' . $value, 'color' => 'secondary'];
+            }
 
             foreach (request('tags', []) as $tagId) {
                 $tag = $tags->firstWhere('id', $tagId);
@@ -267,9 +294,9 @@
             <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr>
+                    <tr class="text-center">
                         <th scope="col" class="border-end">#</th>
-                        <th scope="col">Id</th>
+                        <th scope="col">MATR</th>
                         <th scope="col">Bibliography</th>
                         <th scope="col">Origin</th>
                         <th scope="col">Text</th>

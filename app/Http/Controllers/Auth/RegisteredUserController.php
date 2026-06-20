@@ -36,6 +36,7 @@ class RegisteredUserController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->whereNull('deleted_at')],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'privacy_policy' => ['accepted'],
         ]);
 
         $user = User::create([

@@ -6,7 +6,7 @@ function createSearchRow(count) {
             <option value="NOT">NOT</option>
     </select>    
     <input type="text" class="form-control" name="search[${count}][term]" placeholder="Search string...">
-        <input type="number" class="form-control w-20" name="search[${count}][within]" placeholder="Within n chars from last word">
+        <input type="number" class="form-control w-20" name="search[${count}][within]" min="0" placeholder="Within n chars from last word">
         <div class="form-check form-switch mb-0 text-nowrap">
             <input class="form-check-input" type="checkbox" name="search[${count}][exact]" id="exact_${count}">
             <label class="form-check-label" for="exact_${count}">Exact</label>

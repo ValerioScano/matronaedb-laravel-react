@@ -22,7 +22,7 @@ function createPersonRow(index, values = {}) {
             </div>
             <div class="col-2 mb-3">
                 <label class="form-label">TM_PER id</label>
-                <input type="number" name="people[${index}][TM_PER_id]" class="form-control" value="${values.TM_PER_id ?? ''}">
+                <input type="number" name="people[${index}][TM_PER_id]" class="form-control" min="0" value="${values.TM_PER_id ?? ''}">
             </div>
             <div class="col-1 mb-3 d-flex align-items-end">
                 <button type="button" class="btn btn-danger remove-person-btn">×</button>

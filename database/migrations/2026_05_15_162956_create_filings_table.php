@@ -1,5 +1,7 @@
 <?php
 
+use App\Enums\Macroarea;
+use App\Enums\Province;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,8 +16,8 @@ return new class extends Migration
         Schema::create('filings', function (Blueprint $table) {
             $table->id();
             $table->text('text');
-            $table->string('region')->index();
-            $table->string('province')->index();
+            $table->enum('macroarea', Macroarea::values())->index();
+            $table->enum('province', Province::values())->index();
             $table->string('city')->nullable()->index();
             $table->smallInteger('min_year')->nullable()->index();
             $table->smallInteger('max_year')->nullable()->index();

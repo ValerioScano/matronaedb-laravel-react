@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\Province;
 use App\Http\Controllers\FilingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProposalController;
@@ -15,11 +16,12 @@ Route::get('/', function () {
     return view('pages.welcome', [
         'filingsCount' => Filing::count(),
         'provincesCount' => Filing::distinct()->count('province'),
+        'totalProvincesCount' => count(Province::cases()),
         'peopleCount' => Person::count(),
     ]);
 })->name('welcome');
 
-Route::view('/esercizio', 'pages.esercizio');
+Route::view('/instructions', 'pages.instructions');
 
 // Dashboard
 Route::get('/dashboard', [ProfileController::class, 'dashboard'])
@@ -29,6 +31,7 @@ Route::get('/dashboard', [ProfileController::class, 'dashboard'])
 // Filings
 Route::prefix('filings')->name('filings.')->group(function () {
     Route::get('/', [FilingController::class, 'index'])->name('index');
+    Route::get('/export', [FilingController::class, 'export'])->name('export');
     Route::get('/{filing}', [FilingController::class, 'show'])->name('show');
     Route::delete('/{filing}', [FilingController::class, 'destroy'])
         ->middleware(['auth', 'verified', 'admin'])

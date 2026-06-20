@@ -31,11 +31,11 @@
                                 @if ($proposal->trashed())
                                     Deleted proposal #{{$proposal->id}} 
                                 @elseif($filing)
-                                    Revision on filing #{{ $filing->id }}
+                                    Revision on MATR {{ $filing->id }}
                                 @elseif($proposal->status === 'approved' && $proposal->filing_id)
-                                    Creation of filing #{{ $proposal->filing_id }}
+                                    Creation of MATR {{ $proposal->filing_id }}
                                 @else
-                                    Filing proposal #{{ $proposal->id }}
+                                    Proposal #{{ $proposal->id }}
                                 @endif
                             </h1>
                             <span
@@ -81,7 +81,7 @@
                                 <div class="mb-1">
                                     <strong>{{ ucfirst($category) }}:</strong>
                                     @foreach ($tags as $tag)
-                                        <span class="badge bg-primary">{{ $tag->label }}</span>
+                                        <span class="badge" style="{{ $tag->badgeStyle() }}">{{ $tag->label }}</span>
                                     @endforeach
                                 </div>
                             @empty
@@ -262,11 +262,11 @@
                 <div class="col-12 col-lg-6 border-top border-lg-start mt-4 mt-lg-0">
                     <div class="row align-items-center">
                         <div class="col-12 text-center p-5">
-                            <h1>Filing #{{ $filing->id }}</h1>
+                            <h1>MATR {{ $filing->id }}</h1>
                         </div>
                     </div>
 
-                    <div class="row mb-4 g-4 mt-5">
+                    <div class="row mb-4 g-4 mt-4">
 
                         <div class="col-12 col-md-4 d-flex flex-column gap-3">
 
@@ -276,7 +276,7 @@
                                     <div class="mb-1">
                                         <strong>{{ ucfirst($category) }}:</strong>
                                         @foreach ($tags as $tag)
-                                            <span class="badge bg-primary">{{ $tag->label }}</span>
+                                            <span class="badge" style="{{ $tag->badgeStyle() }}">{{ $tag->label }}</span>
                                         @endforeach
                                     </div>
                                 @empty

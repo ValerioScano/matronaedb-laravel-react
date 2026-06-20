@@ -95,7 +95,7 @@
 
         <footer class="border-top sticky-bottom bg-white">
             <div class="container">
-                <div class="row py-3 mb-3">
+                <div class="row py-3 mb-3 justify-content-around">
                     <div class="col-md-4">
                         <ul style="list-style-type: none" class="p-0 m-0">
                             <li><a class="fw-semibold fs-5 gap-2 d-flex align-items-center" href="{{ url('/') }}"
@@ -105,10 +105,16 @@
                                     <span>MatronaeDB</span>
                                 </a>
                             </li>
+
                             <li>
                                 <a class="link" href="{{ url('/filings') }}">{{ __('Browse database') }}</a>
                             </li>
-
+                            <li>
+                                <button type="button" class="btn btn-link p-0 align-baseline text-decoration-underline"
+                                    data-bs-toggle="modal" data-bs-target="#cookiepolicy">
+                                    Cookie policy
+                                </button>
+                            </li>
                             @guest
 
                                 <li>
@@ -138,6 +144,8 @@
                                     @csrf
                                     </form>
                                 @endguest
+
+                        </ul>
                     </div>
 
                     <div class="col-md-4">
@@ -161,15 +169,55 @@
                     <div class="col-md-4">
                         <span class="fw-semibold fs-5">Help the project</span>
                         <ul style="list-style-type: none" class="p-0 m-0">
-                        <li>
-                            <a href="https://paypal.me/vscano00" class="btn btn-outline-dark mt-3">
-                                Buy us a coffee! <i class="bi bi-cup-hot-fill"></i>
-                            </a>
-                        </li>
+                            <li>
+                                <a href="https://paypal.me/vscano00" class="btn btn-outline-dark mt-3">
+                                    Buy us a coffee! <i class="bi bi-cup-hot-fill"></i>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
+
                 </div>
             </div>
         </footer>
+    </div>
+
+    <div class="modal fade" id="cookiepolicy" tabindex="-1" aria-labelledby="cookiepolicyLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="cookiepolicyLabel">Cookie policy</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        This website uses only technical cookies that are strictly necessary for
+                        it to function. We do not use profiling cookies or third-party cookies,
+                        so no consent is required.
+                    </p>
+                    The cookies we set are:
+
+
+                    <ul>
+                        <li>
+                            laravel_session — keeps your session active while you browse. (Session)
+                        </li>
+                        <li>
+                            XSRF-TOKEN — protects forms against CSRF attacks (security). (Session)
+                        </li>
+                        <li> remember_web_* — keeps you logged in if you choose "Remember me".
+                            (Persistent)
+                        </li>
+                    </ul>
+
+                    These cookies do not track you and are not shared with anyone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">All clear!</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     @yield('scripts')

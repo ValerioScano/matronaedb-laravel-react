@@ -12,8 +12,8 @@
             <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr>
-                        <th scope="col">Id</th>
+                    <tr class="text-center">
+                        <th scope="col">Proposal id</th>
                         <th scope="col">Status</th>
                         <th scope="col">Bibliography</th>
                         <th scope="col">Origin</th>

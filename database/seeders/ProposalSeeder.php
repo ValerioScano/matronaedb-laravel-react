@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Macroarea;
+use App\Enums\Province;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Proposal;
@@ -19,8 +21,8 @@ class ProposalSeeder extends Seeder
             $year2 = $faker->numberBetween(-100, 700);
             $newProposal= new Proposal();
             $newProposal->text = $faker->paragraphs(4, true);
-            $newProposal->region = $faker->country();
-            $newProposal->province= $faker->state();
+            $newProposal->macroarea = $faker->randomElement(Macroarea::values());
+            $newProposal->province = $faker->randomElement(Province::values());
             $newProposal->city = $faker->city();
             $newProposal->min_year = min($year1, $year2);
             $newProposal->max_year = max($year1, $year2);

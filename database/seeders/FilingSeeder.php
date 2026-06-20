@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Macroarea;
+use App\Enums\Province;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Filing;
@@ -21,8 +23,8 @@ class FilingSeeder extends Seeder
             $year2 = $faker->numberBetween(-100, 700);
             $newFiling= new Filing();
             $newFiling->text = $faker->paragraphs(4, true);
-            $newFiling->region = $faker->country();
-            $newFiling->province= $faker->state();
+            $newFiling->macroarea = $faker->randomElement(Macroarea::values());
+            $newFiling->province = $faker->randomElement(Province::values());
             $newFiling->city = $faker->city();
             $newFiling->min_year = min($year1, $year2);
             $newFiling->max_year = max($year1, $year2);

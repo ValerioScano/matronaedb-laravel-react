@@ -13,8 +13,8 @@
             <div class="table-responsive">
             <table class="table">
                 <thead>
-                    <tr>
-                        <th scope="col">Id</th>
+                    <tr class="text-center">
+                        <th scope="col">Proposal id</th>
                         <th scope="col">Bibliography</th>
                         <th scope="col">Origin</th>
                         <th scope="col">Text</th>
@@ -36,7 +36,7 @@
 
                             <td>{{ $user_proposal->location }}</td>
                             <td>{{ $user_proposal->textTruncate() }}</td>
-                            <td>{{ $user_proposal->datation }}</td>
+                            <td class="text-nowrap">{{ $user_proposal->datation }}</td>
                             <td><a href="{{ route('proposals.show', $user_proposal->id) }}" class="btn btn-primary btn-sm">Details</a></td>
                         </tr>
                     @endforeach

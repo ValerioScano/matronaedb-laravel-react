@@ -23,7 +23,7 @@
                         <p class="text-muted">Filings</p>
                     </div>
                     <div class="col-4">
-                        <h2>{{ $provincesCount }}/66</h2>
+                        <h2>{{ $provincesCount }}/{{ $totalProvincesCount }}</h2>
                         <p class="text-muted">Provinces</p>
                     </div>
                     <div class="col-4">

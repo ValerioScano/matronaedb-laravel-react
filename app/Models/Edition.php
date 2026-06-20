@@ -18,6 +18,7 @@ class Edition extends Model
         'publication_year',
         'corpus_page',
         'last_name_author',
+        'publication_place',
         'edition_image',
         'link',
     ];
