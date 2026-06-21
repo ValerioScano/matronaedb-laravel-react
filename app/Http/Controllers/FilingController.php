@@ -75,7 +75,7 @@ class FilingController extends Controller
                         $within     = isset($row['within']) && $row['within'] !== '' ? (int) $row['within'] : null;
                         $operator   = $row['operator'] ?? 'AND';
                         $exact      = ! empty($row['exact']);
-                        $normalized = "REGEXP_REPLACE(LOWER(text), '[^a-z0-9 ]', '')";
+                        $normalized = "regexp_replace(lower(text), '[^a-z0-9 ]', '', 'g')";
 
                         if ($exact) {
                             // Space-pad so LIKE '% term %' only matches whole words.
@@ -109,7 +109,7 @@ class FilingController extends Controller
         $tags = Tag::all();
         $pairedTags = $this->buildTagPairs($tags);
 
-        $filings = $this->filteredFilingsQuery($request)->paginate(100);
+        $filings = $this->filteredFilingsQuery($request)->orderBy('updated_at', 'desc')->paginate(100);
 
         return view('pages.filings.index', compact('filings', 'pairedTags', 'tags'));
     }

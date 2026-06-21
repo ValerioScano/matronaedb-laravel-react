@@ -132,6 +132,7 @@ class ProposalController extends Controller
         $proposal->religion = $data['religion'];
         $proposal->notes = $data['notes'] ?? null;
         $proposal->private_notes = $data['private_notes'] ?? null;
+        $proposal->status = 'pending';
         $proposal->proposed_by = Auth::id();
         $proposal->save();
 
@@ -355,6 +356,7 @@ class ProposalController extends Controller
         $proposal->religion = $data['religion'];
         $proposal->notes = $data['notes'] ?? null;
         $proposal->private_notes = $data['private_notes'] ?? null;
+        $proposal->status = 'pending';
         $proposal->save();
 
         // 2. Salva le edizioni

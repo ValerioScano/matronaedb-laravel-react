@@ -85,6 +85,7 @@
                         <li>⟦abc⟧ (double square brackets) — erased letter.</li>
                         <li>⟪abc⟫ (double angle brackets) — letters carved in place of others that were erased.</li>
                         <li>‘abc’ — ancient additions or corrections.</li>
+                        <li>{abc} (curly brackets)- expunction of letters  </li>
                         <li>[- - -] — lost letters</li>
                         <li>[abc] — lost letters that can be restored.</li>
                         <li>
