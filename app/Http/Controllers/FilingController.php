@@ -109,7 +109,7 @@ class FilingController extends Controller
         $tags = Tag::all();
         $pairedTags = $this->buildTagPairs($tags);
 
-        $filings = $this->filteredFilingsQuery($request)->orderBy('updated_at', 'desc')->paginate(100);
+        $filings = $this->filteredFilingsQuery($request)->paginate(100);
 
         return view('pages.filings.index', compact('filings', 'pairedTags', 'tags'));
     }

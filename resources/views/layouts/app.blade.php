@@ -93,13 +93,13 @@
             @yield('content')
         </main>
 
-        <footer class="border-top sticky-bottom bg-white">
+        <footer class="border-top sticky-md-bottom bg-white">
             <div class="container">
-                <div class="row py-3 mb-3 justify-content-around">
-                    <div class="col-md-4">
+                <div class="row py-3 mb-3 justify-content-around g-3">
+                    <div class="col-md-4 text-center text-md-start">
                         <ul style="list-style-type: none" class="p-0 m-0">
-                            <li><a class="fw-semibold fs-5 gap-2 d-flex align-items-center" href="{{ url('/') }}"
-                                    style="text-decoration: none; color: inherit">
+                            <li><a class="fw-semibold fs-5 gap-2 d-flex align-items-center justify-content-center justify-content-md-start"
+                                    href="{{ url('/') }}" style="text-decoration: none; color: inherit">
                                     <img src="{{ asset('img/logo.png') }}" alt="logo MatronaeDB" width="30"
                                         height="24" class="d-inline-block align-text-top">
                                     <span>MatronaeDB</span>
@@ -148,16 +148,18 @@
                         </ul>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4 text-center text-md-start">
                         <span class="fw-semibold fs-5">About us</span>
                         <ul style="list-style-type: none" class="p-0 m-0">
                             <li>Alice Cicarelli <a href="mailto:alice.cicarelli@uniroma1.it"><i
-                                        class="bi bi-envelope-at-fill"></i></a> <a
-                                    href="https://www.linkedin.com/in/alice-cicarelli-6946a9364/"><i
-                                        class="bi bi-linkedin"></i></a> <a
-                                    href="https://phd.uniroma1.it/web/dottorato-sapienza-filologia-e-storia-del-mondo-antico-cicarelli-alice_nP1901686.aspx"><img
-                                        src="/img/logo Sapienza (rgb).png" alt="logo sapienza"
-                                        style="height: 2.5em; width: auto; vertical-align: middle;"></a></li>
+                                        class="bi bi-envelope-at-fill"></i></a>
+                                <a
+                                    href="https://phd.uniroma1.it/web/dottorato-sapienza-filologia-e-storia-del-mondo-antico-cicarelli-alice_nP1901686.aspx"><i
+                                        class="bi bi-mortarboard-fill"></i></a>
+                                <a href="https://www.linkedin.com/in/alice-cicarelli-6946a9364/"><i
+                                        class="bi bi-linkedin"></i></a>
+                            </li>
+                            
                             <li>Valerio Scano <a href="mailto:valerioscano00@gmail.com"><i
                                         class="bi bi-envelope-at-fill"></i></a> <a
                                     href="https://www.linkedin.com/in/valerio-scano-aa3b252a6/"><i
@@ -166,7 +168,7 @@
                         </ul>
                     </div>
 
-                    <div class="col-md-4">
+                    <div class="col-md-4 text-center text-md-start">
                         <span class="fw-semibold fs-5">Help the project</span>
                         <ul style="list-style-type: none" class="p-0 m-0">
                             <li>
