@@ -38,6 +38,7 @@ enum Province: string
     case RegioVIII = 'Regio VIII';
     case RegioIX = 'Regio IX';
     case RegioX = 'Regio X';
+    case RegioXI = 'Regio XI';
     case Sicilia = 'Sicilia';
     case Sardegna = 'Sardegna';
     case Corsica = 'Corsica';
